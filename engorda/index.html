@@ -138,6 +138,14 @@
         </div>
 
         <div class="filter-group">
+            <label for="f-dia-lote">Día - Lote (Source.Name)</label>
+            <select id="f-dia-lote">
+                <option value="all">Todos</option>
+            </select>
+        </div>
+
+        
+        <div class="filter-group">
             <label for="f-sector">Sector</label>
             <select id="f-sector">
                 <option value="all">Todos</option>
@@ -249,6 +257,7 @@ fetch('../Rengo.csv')
         const iAnio = idx('Año');
         const iMes = idx('MES');
         const iSemana = idx('Semana');
+        const iSourceName = idx('Source.Name');
         const iSector = idx('Sector');
         const iPabellon = idx('Pabellon');
         const iPesoVivo = idx(' Peso Vivo ') !== -1 ? idx(' Peso Vivo ') : idx('Peso Vivo');
@@ -278,6 +287,7 @@ fetch('../Rengo.csv')
                     semana: iSemana === -1 ? '' : cols[iSemana].trim(),
                     sector: iSector === -1 ? '' : cols[iSector].trim(),
                     pabellon: iPabellon === -1 ? '' : cols[iPabellon].trim(),
+                    diaLote: iSourceName === -1 ? '' : cols[iSourceName].trim(),
                     pesoVivo: num(cols[iPesoVivo]),
                     edad: iEdad === -1 ? NaN : num(cols[iEdad]),
                     eficiencia: iEficiencia === -1 ? NaN : num(cols[iEficiencia]),
@@ -300,6 +310,7 @@ fetch('../Rengo.csv')
 const selAnio = document.getElementById('f-anio');
 const selMes = document.getElementById('f-mes');
 const selSemana = document.getElementById('f-semana');
+const selDiaLote = document.getElementById('f-dia-lote'); 
 const selSector = document.getElementById('f-sector');
 const selPabellon = document.getElementById('f-pabellon');
 const btnClear = document.getElementById('btn-clear');
@@ -318,6 +329,7 @@ function poblarFiltros(rows) {
     poblarSelect(selAnio, rows.map(r => r.anio));
     poblarSelect(selMes, rows.map(r => r.mes));
     poblarSelect(selSemana, rows.map(r => r.semana));
+    poblarSelect(selDiaLote, rows.map(r => r.diaLote));
     poblarSelect(selSector, rows.map(r => r.sector));
     poblarSelect(selPabellon, rows.map(r => r.pabellon));
 }
@@ -327,18 +339,20 @@ function filtrar(rows) {
         (selAnio.value === 'all' || r.anio === selAnio.value) &&
         (selMes.value === 'all' || r.mes === selMes.value) &&
         (selSemana.value === 'all' || r.semana === selSemana.value) &&
+        (selDiaLote.value === 'all' || r.diaLote === selDiaLote.value) &&
         (selSector.value === 'all' || r.sector === selSector.value) &&
         (selPabellon.value === 'all' || r.pabellon === selPabellon.value)
     );
 }
 
 selAnio.onchange = selMes.onchange = selSemana.onchange =
-selSector.onchange = selPabellon.onchange = aplicarFiltrosYActualizar;
+selDiaLote.onchange = selSector.onchange = selPabellon.onchange = aplicarFiltrosYActualizar;
 
 btnClear.onclick = () => {
     selAnio.value = 'all';
     selMes.value = 'all';
     selSemana.value = 'all';
+    selDiaLote.value = 'all';
     selSector.value = 'all';
     selPabellon.value = 'all';
     aplicarFiltrosYActualizar();
