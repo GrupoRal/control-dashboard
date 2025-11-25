@@ -201,8 +201,8 @@
                 <div class="kpi-value" id="kpi-edad-prom">-</div>
             </div>
             <div class="card">
-                <div class="kpi-label">Eficiencia promedio</div>
-                <div class="kpi-value" id="kpi-eficiencia-prom">-</div>
+                <div class="kpi-label">Ganancia diaria promedio (kg/día)</div>
+                <div class="kpi-value" id="kpi-ganancia-diaria">-</div>
             </div>
         </div>
 
@@ -262,7 +262,7 @@ fetch('../Rengo.csv')
         const iPabellon = idx('Pabellon');
         const iPesoVivo = idx(' Peso Vivo ') !== -1 ? idx(' Peso Vivo ') : idx('Peso Vivo');
         const iEdad = idx('Edad');
-        const iEficiencia = idx('Eficiencia');
+        const iGanancia = idx('Ganancia');
         const iViajes = idx('Viajes');
         const iAgrupa = idx('Agrupacion CAT LIQ');
 
@@ -281,6 +281,13 @@ fetch('../Rengo.csv')
                     return parseFloat(String(v).replace(',', '.'));
                 };
 
+                const edad = iEdad === -1 ? NaN : num(cols[iEdad]);
+                const ganancia = iGanancia === -1 ? NaN : num(cols[iGanancia]);
+                
+                const gananciaDiaria = (!isNaN(edad) && edad > 0 && !isNaN(ganancia)) 
+                    ? (ganancia / edad) 
+                    : NaN;
+                
                 return {
                     anio: iAnio === -1 ? '' : cols[iAnio].trim(),
                     mes: iMes === -1 ? '' : cols[iMes].trim(),
@@ -288,12 +295,16 @@ fetch('../Rengo.csv')
                     sector: iSector === -1 ? '' : cols[iSector].trim(),
                     pabellon: iPabellon === -1 ? '' : cols[iPabellon].trim(),
                     diaLote: iSourceName === -1 ? '' : cols[iSourceName].trim(),
+                
                     pesoVivo: num(cols[iPesoVivo]),
-                    edad: iEdad === -1 ? NaN : num(cols[iEdad]),
-                    eficiencia: iEficiencia === -1 ? NaN : num(cols[iEficiencia]),
+                    edad: edad,
+                    ganancia: ganancia,
+                    gananciaDiaria: gananciaDiaria,   // ✅ NUEVO
+                
                     viajes: iViajes === -1 ? NaN : num(cols[iViajes]),
                     categoria: iAgrupa === -1 ? 'Sin dato' : cols[iAgrupa].trim()
                 };
+
             })
             .filter(r => !isNaN(r.pesoVivo)); // solo filas con peso vivo
 
@@ -414,7 +425,8 @@ function actualizarKPIs(rows) {
 
     const pesoProm = promedio(rows.map(r => r.pesoVivo));
     const edadProm = promedio(rows.map(r => isNaN(r.edad) ? 0 : r.edad));
-    const eficienciaProm = promedio(rows.map(r => isNaN(r.eficiencia) ? 0 : r.eficiencia));
+    const gananciaDiariaProm = promedio(
+        rows.map(r => isNaN(r.gananciaDiaria) ? 0 : r.gananciaDiaria));
 
     const fmtKg = v => isNaN(v) ? 'N/D' : v.toLocaleString('es-CL', {maximumFractionDigits: 0});
     const fmt = v => isNaN(v) ? 'N/D' : v.toFixed(2);
@@ -425,7 +437,8 @@ function actualizarKPIs(rows) {
 
     document.getElementById('kpi-peso-prom').textContent = fmt(pesoProm) + ' kg';
     document.getElementById('kpi-edad-prom').textContent = isNaN(edadProm) ? 'N/D' : edadProm.toFixed(0) + ' días';
-    document.getElementById('kpi-eficiencia-prom').textContent = fmt(eficienciaProm);
+    document.getElementById('kpi-ganancia-diaria').textContent =
+        isNaN(gananciaDiariaProm) ? 'N/D' : gananciaDiariaProm.toFixed(3) + ' kg/día';
 }
 
 function actualizarCategoria(rows) {
