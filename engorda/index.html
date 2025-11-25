@@ -2,227 +2,443 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Engorda – Rengo</title>
+    <title>Venta de Cerdos – Rengo</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        * { box-sizing: border-box; }
         body {
+            margin: 0;
             font-family: Arial, sans-serif;
             background: #f4f6f8;
-            margin: 0;
-            padding: 20px;
         }
-        .container {
-            max-width: 1100px;
-            margin: auto;
+        .layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
         }
-        .top-bar {
+        .sidebar {
+            background: #0b3654;
+            color: white;
+            padding: 16px;
+        }
+        .sidebar h2 {
+            margin-top: 0;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        .filter-group {
+            margin-bottom: 12px;
+        }
+        .filter-group label {
+            font-size: 12px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .filter-group select {
+            width: 100%;
+            padding: 4px;
+            border-radius: 4px;
+            border: none;
+        }
+        .main {
+            padding: 16px 24px;
+        }
+        .top-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 16px;
+            margin-bottom: 12px;
         }
-        .kpi-grid {
+        .top-header h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+        .btn {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-clear {
+            background: #e53935;
+            color: white;
+        }
+        .btn-back {
+            background: #ddd;
+        }
+        .kpi-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
-            margin: 20px 0;
+            margin-bottom: 12px;
         }
-        .kpi {
+        .kpi-row-2 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .card {
             background: white;
             padding: 12px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
         }
         .kpi-label {
-            font-size: 12px;
+            font-size: 11px;
             color: #666;
         }
         .kpi-value {
             font-size: 20px;
             font-weight: bold;
         }
-        .chart-box {
-            background: white;
-            padding: 16px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            margin-top: 20px;
+        .kpi-sub {
+            font-size: 11px;
+            color: #999;
         }
-        a {
-            text-decoration: none;
-        }
-        button {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
+        .chart-wrapper {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 12px;
         }
         .error {
             color: #b00020;
-            margin-top: 10px;
+            font-size: 12px;
+            margin-top: 6px;
         }
+        a { text-decoration: none; }
     </style>
 </head>
 <body>
-<div class="container">
 
-    <div class="top-bar">
-        <div>
-            <h1>🐷 Dashboard Engorda – Rengo</h1>
-            <p>Datos reales desde <strong>Rengo.csv</strong> (Peso Vivo, Edad, Eficiencia).</p>
-        </div>
-        <div>
-            <a href="../index.html">
-                <button>⬅ Volver al panel principal</button>
-            </a>
-        </div>
-    </div>
+<div class="layout">
+    <!-- SIDEBAR FILTROS -->
+    <aside class="sidebar">
+        <h2>Filtros</h2>
 
-    <!-- KPIs superiores -->
-    <div class="kpi-grid">
-        <div class="kpi">
-            <div class="kpi-label">Peso vivo promedio (kg)</div>
-            <div class="kpi-value" id="kpi-peso">-</div>
+        <div class="filter-group">
+            <label for="f-anio">Año</label>
+            <select id="f-anio">
+                <option value="all">Todos</option>
+            </select>
         </div>
-        <div class="kpi">
-            <div class="kpi-label">Edad promedio (días)</div>
-            <div class="kpi-value" id="kpi-edad">-</div>
-        </div>
-        <div class="kpi">
-            <div class="kpi-label">Eficiencia promedio</div>
-            <div class="kpi-value" id="kpi-eficiencia">-</div>
-        </div>
-    </div>
 
-    <!-- Gráfico por semana -->
-    <div class="chart-box">
-        <h3>Peso vivo promedio por semana</h3>
-        <canvas id="pesoSemanaChart"></canvas>
-        <div id="error-msg" class="error"></div>
-    </div>
+        <div class="filter-group">
+            <label for="f-mes">MES</label>
+            <select id="f-mes">
+                <option value="all">Todos</option>
+            </select>
+        </div>
 
+        <div class="filter-group">
+            <label for="f-semana">Semana</label>
+            <select id="f-semana">
+                <option value="all">Todas</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="f-sector">Sector</label>
+            <select id="f-sector">
+                <option value="all">Todos</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="f-pabellon">Pabellón</label>
+            <select id="f-pabellon">
+                <option value="all">Todos</option>
+            </select>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main">
+        <div class="top-header">
+            <div>
+                <h1>Venta de Cerdos – Rengo</h1>
+                <div style="font-size:12px;color:#555;">
+                    Datos desde Rengo.csv – Peso Vivo, Edad, Eficiencia, Viajes, etc.
+                </div>
+            </div>
+            <div>
+                <button class="btn btn-clear" id="btn-clear">Eliminar filtros</button>
+                <a href="../index.html"><button class="btn btn-back">Volver</button></a>
+            </div>
+        </div>
+
+        <!-- KPIs principales -->
+        <div class="kpi-row">
+            <div class="card">
+                <div class="kpi-label">Kg Totales (Peso Vivo)</div>
+                <div class="kpi-value" id="kpi-kg-totales">-</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">N° de Viajes</div>
+                <div class="kpi-value" id="kpi-viajes">-</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">Kg por Viaje</div>
+                <div class="kpi-value" id="kpi-kg-viaje">-</div>
+            </div>
+        </div>
+
+        <div class="kpi-row-2">
+            <div class="card">
+                <div class="kpi-label">Peso vivo promedio (kg)</div>
+                <div class="kpi-value" id="kpi-peso-prom">-</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">Edad promedio (días)</div>
+                <div class="kpi-value" id="kpi-edad-prom">-</div>
+            </div>
+            <div class="card">
+                <div class="kpi-label">Eficiencia promedio</div>
+                <div class="kpi-value" id="kpi-eficiencia-prom">-</div>
+            </div>
+        </div>
+
+        <!-- Zona central: gráfico + tabla resumen por categoría -->
+        <div class="chart-wrapper">
+            <div class="card">
+                <h3 style="margin-top:0;font-size:15px;">Peso Vivo según Categoría (Agrupación CAT LIQ)</h3>
+                <canvas id="chart-categoria"></canvas>
+                <div id="msg-error" class="error"></div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top:0;font-size:15px;">Resumen por categoría</h3>
+                <div style="font-size:12px;">
+                    <table id="tabla-categoria" style="width:100%;border-collapse:collapse;font-size:12px;">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left;border-bottom:1px solid #ddd;">Categoría</th>
+                                <th style="text-align:right;border-bottom:1px solid #ddd;">Kg</th>
+                                <th style="text-align:right;border-bottom:1px solid #ddd;">%</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
 </div>
 
 <script>
-// Lee Rengo.csv desde la raíz del repositorio
+// ----------- 1. CARGA Y PARSEO DEL CSV ------------
+let datosOriginales = [];
+let chartCategoria = null;
+
 fetch('../Rengo.csv')
-    .then(response => response.text())
-    .then(csvText => {
-
-        // Separar líneas
-        const filas = csvText.trim().split(/\r?\n/);
-
+    .then(res => res.text())
+    .then(texto => {
+        const filas = texto.trim().split(/\r?\n/);
         if (filas.length <= 1) {
-            document.getElementById('error-msg').textContent = 'El archivo Rengo.csv no tiene datos.';
+            document.getElementById('msg-error').textContent = 'Rengo.csv no tiene datos.';
             return;
         }
 
-        // Detectar separador (coma o punto y coma)
-        const separador = filas[0].includes(';') ? ';' : ',';
+        // Detectar separador
+        const sep = filas[0].includes(';') ? ';' : ',';
+        const headers = filas[0].split(sep).map(h => h.trim());
 
-        // Encabezados
-        const encabezados = filas[0].split(separador).map(h => h.trim());
+        const idx = nombre => headers.indexOf(nombre);
 
-        // Función auxiliar para obtener valor por nombre de columna
-        function getValor(filaValores, nombreColumna) {
-            const idx = encabezados.indexOf(nombreColumna);
-            if (idx === -1) return '';
-            return (filaValores[idx] || '').trim();
+        const iAnio = idx('Año');
+        const iMes = idx('MES');
+        const iSemana = idx('Semana');
+        const iSector = idx('Sector');
+        const iPabellon = idx('Pabellon');
+        const iPesoVivo = idx(' Peso Vivo ') !== -1 ? idx(' Peso Vivo ') : idx('Peso Vivo');
+        const iEdad = idx('Edad');
+        const iEficiencia = idx('Eficiencia');
+        const iViajes = idx('Viajes');
+        const iAgrupa = idx('Agrupacion CAT LIQ');
+
+        if (iPesoVivo === -1) {
+            document.getElementById('msg-error').textContent = 'No se encontró la columna "Peso Vivo" en Rengo.csv.';
+            return;
         }
 
-        // Convertir filas a objetos con solo las columnas que nos interesan
-        const datos = filas.slice(1)
+        datosOriginales = filas.slice(1)
             .filter(l => l.trim().length > 0)
             .map(linea => {
-                const valores = linea.split(separador);
-                const pesoVivoStr = getValor(valores, 'Peso Vivo') || getValor(valores, ' Peso Vivo ');
-                const edadStr = getValor(valores, 'Edad');
-                const eficienciaStr = getValor(valores, 'Eficiencia');
-                const semanaStr = getValor(valores, 'Semana');
+                const cols = linea.split(sep);
 
-                // Reemplazar coma decimal por punto si viene así
-                const pesoVivo = parseFloat((pesoVivoStr || '').replace(',', '.'));
-                const edad = parseFloat((edadStr || '').replace(',', '.'));
-                const eficiencia = parseFloat((eficienciaStr || '').replace(',', '.'));
+                const num = v => {
+                    if (!v) return NaN;
+                    return parseFloat(String(v).replace(',', '.'));
+                };
 
                 return {
-                    pesoVivo,
-                    edad,
-                    eficiencia,
-                    semana: semanaStr || 'Sin semana'
+                    anio: iAnio === -1 ? '' : cols[iAnio].trim(),
+                    mes: iMes === -1 ? '' : cols[iMes].trim(),
+                    semana: iSemana === -1 ? '' : cols[iSemana].trim(),
+                    sector: iSector === -1 ? '' : cols[iSector].trim(),
+                    pabellon: iPabellon === -1 ? '' : cols[iPabellon].trim(),
+                    pesoVivo: num(cols[iPesoVivo]),
+                    edad: iEdad === -1 ? NaN : num(cols[iEdad]),
+                    eficiencia: iEficiencia === -1 ? NaN : num(cols[iEficiencia]),
+                    viajes: iViajes === -1 ? NaN : num(cols[iViajes]),
+                    categoria: iAgrupa === -1 ? 'Sin dato' : cols[iAgrupa].trim()
                 };
-            });
+            })
+            .filter(r => !isNaN(r.pesoVivo)); // solo filas con peso vivo
 
-        // Filtrar filas válidas (que tengan peso vivo numérico)
-        const datosValidos = datos.filter(d => !isNaN(d.pesoVivo));
-
-        if (datosValidos.length === 0) {
-            document.getElementById('kpi-peso').textContent = 'Sin datos';
-            document.getElementById('kpi-edad').textContent = 'Sin datos';
-            document.getElementById('kpi-eficiencia').textContent = 'Sin datos';
-            document.getElementById('error-msg').textContent = 'No se encontraron filas con Peso Vivo numérico.';
-            return;
-        }
-
-        // Función promedio
-        const promedio = arr => arr.reduce((a, b) => a + b, 0) / arr.length;
-
-        // KPIs
-        const pesoProm = promedio(datosValidos.map(d => d.pesoVivo));
-        const edadProm = promedio(datosValidos.map(d => isNaN(d.edad) ? 0 : d.edad));
-        const eficienciaProm = promedio(datosValidos.map(d => isNaN(d.eficiencia) ? 0 : d.eficiencia));
-
-        document.getElementById('kpi-peso').textContent = pesoProm.toFixed(1) + ' kg';
-        document.getElementById('kpi-edad').textContent = isNaN(edadProm) ? 'N/D' : edadProm.toFixed(0) + ' días';
-        document.getElementById('kpi-eficiencia').textContent = isNaN(eficienciaProm) ? 'N/D' : eficienciaProm.toFixed(2);
-
-        // Agrupar por semana para el gráfico
-        const porSemana = {};
-        datosValidos.forEach(d => {
-            const key = d.semana || 'Sin semana';
-            if (!porSemana[key]) porSemana[key] = [];
-            porSemana[key].push(d.pesoVivo);
-        });
-
-        const etiquetas = Object.keys(porSemana);
-        // Ordenar semanas si son numéricas
-        etiquetas.sort((a, b) => {
-            const na = parseInt(a); const nb = parseInt(b);
-            if (!isNaN(na) && !isNaN(nb)) return na - nb;
-            return a.localeCompare(b);
-        });
-
-        const datosGrafico = etiquetas.map(sem => {
-            const lista = porSemana[sem];
-            return promedio(lista);
-        });
-
-        const ctx = document.getElementById('pesoSemanaChart');
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: etiquetas,
-                datasets: [{
-                    label: 'Peso vivo promedio (kg)',
-                    data: datosGrafico
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: false
-                    }
-                }
-            }
-        });
-
+        poblarFiltros(datosOriginales);
+        aplicarFiltrosYActualizar();
     })
     .catch(err => {
-        console.error('Error leyendo Rengo.csv:', err);
-        document.getElementById('error-msg').textContent = 'Error al leer Rengo.csv (revisa que exista en la raíz del repositorio).';
+        console.error(err);
+        document.getElementById('msg-error').textContent = 'Error al leer Rengo.csv.';
     });
+
+// ----------- 2. FILTROS ------------------
+
+const selAnio = document.getElementById('f-anio');
+const selMes = document.getElementById('f-mes');
+const selSemana = document.getElementById('f-semana');
+const selSector = document.getElementById('f-sector');
+const selPabellon = document.getElementById('f-pabellon');
+const btnClear = document.getElementById('btn-clear');
+
+function poblarSelect(select, valores) {
+    const unicos = Array.from(new Set(valores.filter(v => v && v !== ''))).sort();
+    unicos.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = v;
+        select.appendChild(opt);
+    });
+}
+
+function poblarFiltros(rows) {
+    poblarSelect(selAnio, rows.map(r => r.anio));
+    poblarSelect(selMes, rows.map(r => r.mes));
+    poblarSelect(selSemana, rows.map(r => r.semana));
+    poblarSelect(selSector, rows.map(r => r.sector));
+    poblarSelect(selPabellon, rows.map(r => r.pabellon));
+}
+
+function filtrar(rows) {
+    return rows.filter(r =>
+        (selAnio.value === 'all' || r.anio === selAnio.value) &&
+        (selMes.value === 'all' || r.mes === selMes.value) &&
+        (selSemana.value === 'all' || r.semana === selSemana.value) &&
+        (selSector.value === 'all' || r.sector === selSector.value) &&
+        (selPabellon.value === 'all' || r.pabellon === selPabellon.value)
+    );
+}
+
+selAnio.onchange = selMes.onchange = selSemana.onchange =
+selSector.onchange = selPabellon.onchange = aplicarFiltrosYActualizar;
+
+btnClear.onclick = () => {
+    selAnio.value = 'all';
+    selMes.value = 'all';
+    selSemana.value = 'all';
+    selSector.value = 'all';
+    selPabellon.value = 'all';
+    aplicarFiltrosYActualizar();
+};
+
+// ----------- 3. CÁLCULOS Y GRÁFICOS ------------------
+
+function aplicarFiltrosYActualizar() {
+    const filtrados = filtrar(datosOriginales);
+    actualizarKPIs(filtrados);
+    actualizarCategoria(filtrados);
+}
+
+function promedio(arr) {
+    if (!arr.length) return NaN;
+    return arr.reduce((a,b) => a + b, 0) / arr.length;
+}
+
+function actualizarKPIs(rows) {
+    const kgTotales = rows.reduce((s, r) => s + r.pesoVivo, 0);
+    const viajesTot = rows.reduce((s, r) => s + (isNaN(r.viajes) ? 0 : r.viajes), 0);
+    const kgViaje = viajesTot > 0 ? kgTotales / viajesTot : NaN;
+
+    const pesoProm = promedio(rows.map(r => r.pesoVivo));
+    const edadProm = promedio(rows.map(r => isNaN(r.edad) ? 0 : r.edad));
+    const eficienciaProm = promedio(rows.map(r => isNaN(r.eficiencia) ? 0 : r.eficiencia));
+
+    const fmtKg = v => isNaN(v) ? 'N/D' : v.toLocaleString('es-CL', {maximumFractionDigits: 0});
+    const fmt = v => isNaN(v) ? 'N/D' : v.toFixed(2);
+
+    document.getElementById('kpi-kg-totales').textContent = fmtKg(kgTotales);
+    document.getElementById('kpi-viajes').textContent = isNaN(viajesTot) ? 'N/D' : viajesTot.toFixed(0);
+    document.getElementById('kpi-kg-viaje').textContent = isNaN(kgViaje) ? 'N/D' : kgViaje.toFixed(0);
+
+    document.getElementById('kpi-peso-prom').textContent = fmt(pesoProm) + ' kg';
+    document.getElementById('kpi-edad-prom').textContent = isNaN(edadProm) ? 'N/D' : edadProm.toFixed(0) + ' días';
+    document.getElementById('kpi-eficiencia-prom').textContent = fmt(eficienciaProm);
+}
+
+function actualizarCategoria(rows) {
+    const cont = {};
+    let totalKg = 0;
+
+    rows.forEach(r => {
+        const cat = r.categoria && r.categoria !== '' ? r.categoria : 'Sin dato';
+        if (!cont[cat]) cont[cat] = 0;
+        cont[cat] += r.pesoVivo;
+        totalKg += r.pesoVivo;
+    });
+
+    const categorias = Object.keys(cont).sort();
+    const kgPorCat = categorias.map(c => cont[c]);
+
+    // Tabla resumen
+    const tbody = document.querySelector('#tabla-categoria tbody');
+    tbody.innerHTML = '';
+    categorias.forEach(cat => {
+        const kg = cont[cat];
+        const pct = totalKg > 0 ? (kg * 100 / totalKg) : 0;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${cat}</td>
+            <td style="text-align:right;">${kg.toLocaleString('es-CL', {maximumFractionDigits:0})}</td>
+            <td style="text-align:right;">${pct.toFixed(1)}%</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    // Chart
+    const ctx = document.getElementById('chart-categoria');
+    if (chartCategoria) chartCategoria.destroy();
+
+    chartCategoria = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: categorias,
+            datasets: [{
+                label: 'Kg Peso Vivo',
+                data: kgPorCat
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx2) {
+                            const kg = ctx2.raw;
+                            const pct = totalKg > 0 ? (kg * 100 / totalKg) : 0;
+                            return `${kg.toLocaleString('es-CL', {maximumFractionDigits:0})} kg (${pct.toFixed(1)}%)`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
 </script>
 
 </body>
