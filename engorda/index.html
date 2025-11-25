@@ -201,7 +201,7 @@
                 <div class="kpi-value" id="kpi-edad-prom">-</div>
             </div>
             <div class="card">
-                <div class="kpi-label">Ganancia promedio (kg)</div>
+                <div class="kpi-label">Ganancia Diaria (kg/Dia)</div>
                 <div class="kpi-value" id="kpi-ganancia-prom">-</div>
             </div>
         </div>
@@ -437,7 +437,7 @@ function actualizarKPIs(rows) {
     document.getElementById('kpi-peso-prom').textContent = fmt(pesoProm) + ' kg';
     document.getElementById('kpi-edad-prom').textContent = isNaN(edadProm) ? 'N/D' : edadProm.toFixed(0) + ' días';
     document.getElementById('kpi-ganancia-prom').textContent =
-        isNaN(gananciaProm) ? 'N/D' : gananciaProm.toFixed(2) + ' kg';
+        isNaN(gananciaProm) ? 'N/D' : gananciaProm.toFixed(2);
 }
 
 function actualizarCategoria(rows) {
