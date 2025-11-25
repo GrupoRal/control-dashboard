@@ -201,8 +201,8 @@
                 <div class="kpi-value" id="kpi-edad-prom">-</div>
             </div>
             <div class="card">
-                <div class="kpi-label">Ganancia diaria promedio (kg/día)</div>
-                <div class="kpi-value" id="kpi-ganancia-diaria">-</div>
+                <div class="kpi-label">Ganancia promedio (kg)</div>
+                <div class="kpi-value" id="kpi-ganancia-prom">-</div>
             </div>
         </div>
 
@@ -299,7 +299,6 @@ fetch('../Rengo.csv')
                     pesoVivo: num(cols[iPesoVivo]),
                     edad: edad,
                     ganancia: ganancia,
-                    gananciaDiaria: gananciaDiaria,   // ✅ NUEVO
                 
                     viajes: iViajes === -1 ? NaN : num(cols[iViajes]),
                     categoria: iAgrupa === -1 ? 'Sin dato' : cols[iAgrupa].trim()
@@ -425,8 +424,8 @@ function actualizarKPIs(rows) {
 
     const pesoProm = promedio(rows.map(r => r.pesoVivo));
     const edadProm = promedio(rows.map(r => isNaN(r.edad) ? 0 : r.edad));
-    const gananciaDiariaProm = promedio(
-        rows.map(r => isNaN(r.gananciaDiaria) ? 0 : r.gananciaDiaria));
+    const gananciaProm = promedio(
+        rows.map(r => isNaN(r.ganancia) ? 0 : r.ganancia));
 
     const fmtKg = v => isNaN(v) ? 'N/D' : v.toLocaleString('es-CL', {maximumFractionDigits: 0});
     const fmt = v => isNaN(v) ? 'N/D' : v.toFixed(2);
@@ -437,8 +436,8 @@ function actualizarKPIs(rows) {
 
     document.getElementById('kpi-peso-prom').textContent = fmt(pesoProm) + ' kg';
     document.getElementById('kpi-edad-prom').textContent = isNaN(edadProm) ? 'N/D' : edadProm.toFixed(0) + ' días';
-    document.getElementById('kpi-ganancia-diaria').textContent =
-        isNaN(gananciaDiariaProm) ? 'N/D' : gananciaDiariaProm.toFixed(3) + ' kg/día';
+    document.getElementById('kpi-ganancia-prom').textContent =
+        isNaN(gananciaProm) ? 'N/D' : gananciaProm.toFixed(2) + ' kg';
 }
 
 function actualizarCategoria(rows) {
