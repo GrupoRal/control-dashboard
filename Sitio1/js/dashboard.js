@@ -11,8 +11,13 @@ const ESTADO_DESCRIPCION = {
   "H": "Celo no servido"
 };
 
-
 let estadoChart = null;
+let dataGlobal = [];   // aquí guardamos todo el CSV
+let filtros = {
+  ubicacion: "TODOS",
+  genetica: "TODAS",
+  partos: "TODOS"
+};
 
 // Se ejecuta al cargar la página
 document.addEventListener("DOMContentLoaded", () => {
@@ -27,8 +32,9 @@ function cargarDatosCSV(path) {
     dynamicTyping: true,
     skipEmptyLines: true,
     complete: function (results) {
-      const data = results.data;
-      procesarDatos(data);
+      dataGlobal = results.data || [];
+      inicializarFiltros(dataGlobal);
+      aplicarFiltrosYActualizar();
     },
     error: function (err) {
       console.error("Error cargando CSV", err);
@@ -36,9 +42,119 @@ function cargarDatosCSV(path) {
   });
 }
 
-// Procesar datos y alimentar KPIs, gráfico y tabla
-function procesarDatos(data) {
-  if (!data || data.length === 0) return;
+// Inicializa los combos de filtro con valores únicos del CSV
+function inicializarFiltros(data) {
+  const selUbic = document.getElementById("filtro-ubicacion");
+  const selGen  = document.getElementById("filtro-genetica");
+  const selPar  = document.getElementById("filtro-partos");
+
+  if (!selUbic || !selGen || !selPar) return;
+
+  // Ubicación
+  const ubicaciones = [...new Set(
+    data
+      .map(r => r["Ubicación"] || r["Ubicacion"])
+      .filter(v => v !== null && v !== undefined && v !== "")
+  )].sort();
+
+  ubicaciones.forEach(u => {
+    const opt = document.createElement("option");
+    opt.value = u;
+    opt.textContent = u;
+    selUbic.appendChild(opt);
+  });
+
+  // Genética (dejamos los valores tal como vienen del CSV: "1050", "SUPERCERDA", etc.)
+  // Muy importante para ti: SUPERCERDA es 1050 con ≥17 NV en 1er parto,
+  // pero a nivel de filtro mostramos lo que viene, así puedes diferenciar si quieres.
+  const geneticas = [...new Set(
+    data
+      .map(r => r["Genética"] || r["Genetica"])
+      .filter(v => v !== null && v !== undefined && v !== "")
+  )].sort();
+
+  geneticas.forEach(g => {
+    const opt = document.createElement("option");
+    opt.value = g;
+    opt.textContent = g;
+    selGen.appendChild(opt);
+  });
+
+  // Partos (número)
+  const partos = [...new Set(
+    data
+      .map(r => r["Partos"])
+      .filter(v => v !== null && v !== undefined && v !== "")
+  )].sort((a, b) => a - b);
+
+  partos.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p;
+    opt.textContent = p;
+    selPar.appendChild(opt);
+  });
+
+  // Listeners de cambio
+  selUbic.addEventListener("change", () => {
+    filtros.ubicacion = selUbic.value || "TODOS";
+    aplicarFiltrosYActualizar();
+  });
+
+  selGen.addEventListener("change", () => {
+    filtros.genetica = selGen.value || "TODAS";
+    aplicarFiltrosYActualizar();
+  });
+
+  selPar.addEventListener("change", () => {
+    filtros.partos = selPar.value || "TODOS";
+    aplicarFiltrosYActualizar();
+  });
+}
+
+// Aplica filtros sobre dataGlobal y refresca dashboard
+function aplicarFiltrosYActualizar() {
+  let filtrada = dataGlobal;
+
+  // Filtro Ubicación
+  if (filtros.ubicacion !== "TODOS") {
+    filtrada = filtrada.filter(row => {
+      const u = row["Ubicación"] || row["Ubicacion"] || "";
+      return u === filtros.ubicacion;
+    });
+  }
+
+  // Filtro Genética
+  if (filtros.genetica !== "TODAS") {
+    filtrada = filtrada.filter(row => {
+      const g = row["Genética"] || row["Genetica"] || "";
+      return g === filtros.genetica;
+    });
+  }
+
+  // Filtro Partos
+  if (filtros.partos !== "TODOS") {
+    filtrada = filtrada.filter(row => {
+      const p = row["Partos"];
+      return String(p) === String(filtros.partos);
+    });
+  }
+
+  procesarDatosFiltrados(filtrada);
+}
+
+// Procesar datos filtrados y alimentar KPIs, gráfico y tabla
+function procesarDatosFiltrados(data) {
+  if (!data || data.length === 0) {
+    actualizarKPIs({
+      total: 0,
+      totalProductivas: 0,
+      totalImproductivas: 0,
+      listaRojaCount: 0
+    });
+    renderizarGraficoEstados({});
+    renderizarListaRoja([]);
+    return;
+  }
 
   const total = data.length;
 
@@ -223,7 +339,7 @@ function sugerirAccion(estado, dias, partos) {
   return "-";
 }
 
-// Badge de color según estado
+// Colores + descripción por estado
 function descripcionEstado(estado) {
   let colorClase = "bg-secondary";
 
@@ -237,10 +353,5 @@ function descripcionEstado(estado) {
 
   const desc = ESTADO_DESCRIPCION[estado] || estado || "-";
 
-  // Aquí está la corrección:
-  // badge           → estilo de Bootstrap
-  // badge-estado    → tu estilo personalizado (tamaño)
-  // colorClase      → bg-success / bg-warning / bg-danger
   return `<span class="badge badge-estado ${colorClase}">${desc}</span>`;
 }
-
