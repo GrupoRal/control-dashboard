@@ -41,7 +41,8 @@ let tipoVentanaSeleccionado = "TODAS"; // GESTACION, LACTANCIA, DESTETE, TODAS
 document.addEventListener("DOMContentLoaded", () => {
   cargarDatosCSV("data/estado_madres_actual.csv");
   inicializarClicksTarjetas();
-  inicializarBusqueda(); 
+  inicializarBusqueda();        // 👈 QUE ESTÉ ESTA LÍNEA
+  inicializarExportarVentanas && inicializarExportarVentanas(); // si ya la agregaste
 });
 
 // Leer CSV usando PapaParse
@@ -205,7 +206,8 @@ function aplicarFiltrosYActualizar() {
 
 // Procesar datos filtrados y alimentar KPIs, ventanas biológicas, gráfico y tabla
 function procesarDatosFiltrados(data) {
-  dataFiltradaActual = data;  // 👈 guarda la data filtrada actual
+  dataFiltradaActual = data;  // 👈 IMPORTANTE
+
   if (!data || data.length === 0) {
     actualizarKPIs({
       total: 0,
@@ -214,7 +216,6 @@ function procesarDatosFiltrados(data) {
       listaRojaCount: 0
     });
     actualizarVentanasBiologicas(0, 0, 0);
-    detalleVentanas = { gestacionPasada: [], lactanciaLarga: [], desteteFuera: [] };
     renderizarGraficoEstados({});
     renderizarListaRoja([]);
     renderizarTablaVentanas();
