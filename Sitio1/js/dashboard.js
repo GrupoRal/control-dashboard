@@ -42,100 +42,110 @@ function cargarDatosCSV(path) {
   });
 }
 
-// Inicializa los combos de filtro con valores únicos del CSV
+// Inicializa los combos de filtro
 function inicializarFiltros(data) {
   const selUbic = document.getElementById("filtro-ubicacion");
   const selGen  = document.getElementById("filtro-genetica");
   const selPar  = document.getElementById("filtro-partos");
 
-  if (!selUbic || !selGen || !selPar) return;
+  // --- UBICACIÓN (dinámica desde datos) ---
+  if (selUbic) {
+    const ubicacionesSet = new Set(
+      data
+        .map(r => (r["Ubicación"] || r["Ubicacion"] || "").toString().trim())
+        .filter(v => v !== "")
+    );
+    const ubicaciones = Array.from(ubicacionesSet).sort();
 
-  // Ubicación
-  const ubicaciones = [...new Set(
-    data
-      .map(r => r["Ubicación"] || r["Ubicacion"])
-      .filter(v => v !== null && v !== undefined && v !== "")
-  )].sort();
+    ubicaciones.forEach(u => {
+      const opt = document.createElement("option");
+      opt.value = u;
+      opt.textContent = u;
+      selUbic.appendChild(opt);
+    });
 
-  ubicaciones.forEach(u => {
-    const opt = document.createElement("option");
-    opt.value = u;
-    opt.textContent = u;
-    selUbic.appendChild(opt);
-  });
+    selUbic.addEventListener("change", () => {
+      filtros.ubicacion = selUbic.value || "TODOS";
+      aplicarFiltrosYActualizar();
+    });
+  }
 
-  // Genética (dejamos los valores tal como vienen del CSV: "1050", "SUPERCERDA", etc.)
-  // Muy importante para ti: SUPERCERDA es 1050 con ≥17 NV en 1er parto,
-  // pero a nivel de filtro mostramos lo que viene, así puedes diferenciar si quieres.
-  const geneticas = [...new Set(
-    data
-      .map(r => r["Genética"] || r["Genetica"])
-      .filter(v => v !== null && v !== undefined && v !== "")
-  )].sort();
+  // --- GENÉTICA (fija según tu criterio) ---
+  if (selGen) {
+    const opcionesGen = [
+      { value: "1050", text: "1050 (incluye SUPERCERDA)" },
+      { value: "1020", text: "1020" },
+      { value: "SUPERCERDA_ONLY", text: "SUPERCERDA solo" }
+    ];
 
-  geneticas.forEach(g => {
-    const opt = document.createElement("option");
-    opt.value = g;
-    opt.textContent = g;
-    selGen.appendChild(opt);
-  });
+    opcionesGen.forEach(o => {
+      const opt = document.createElement("option");
+      opt.value = o.value;
+      opt.textContent = o.text;
+      selGen.appendChild(opt);
+    });
 
-  // Partos (número)
-  const partos = [...new Set(
-    data
-      .map(r => r["Partos"])
-      .filter(v => v !== null && v !== undefined && v !== "")
-  )].sort((a, b) => a - b);
+    selGen.addEventListener("change", () => {
+      filtros.genetica = selGen.value || "TODAS";
+      aplicarFiltrosYActualizar();
+    });
+  }
 
-  partos.forEach(p => {
-    const opt = document.createElement("option");
-    opt.value = p;
-    opt.textContent = p;
-    selPar.appendChild(opt);
-  });
+  // --- PARTOS (0 a 10 fijos) ---
+  if (selPar) {
+    for (let p = 0; p <= 10; p++) {
+      const opt = document.createElement("option");
+      opt.value = String(p);
+      opt.textContent = p;
+      selPar.appendChild(opt);
+    }
 
-  // Listeners de cambio
-  selUbic.addEventListener("change", () => {
-    filtros.ubicacion = selUbic.value || "TODOS";
-    aplicarFiltrosYActualizar();
-  });
-
-  selGen.addEventListener("change", () => {
-    filtros.genetica = selGen.value || "TODAS";
-    aplicarFiltrosYActualizar();
-  });
-
-  selPar.addEventListener("change", () => {
-    filtros.partos = selPar.value || "TODOS";
-    aplicarFiltrosYActualizar();
-  });
+    selPar.addEventListener("change", () => {
+      filtros.partos = selPar.value || "TODOS";
+      aplicarFiltrosYActualizar();
+    });
+  }
 }
 
 // Aplica filtros sobre dataGlobal y refresca dashboard
 function aplicarFiltrosYActualizar() {
-  let filtrada = dataGlobal;
+  let filtrada = dataGlobal.slice();
 
   // Filtro Ubicación
-  if (filtros.ubicacion !== "TODOS") {
+  if (filtros.ubicacion !== "TODOS" && filtros.ubicacion) {
     filtrada = filtrada.filter(row => {
-      const u = row["Ubicación"] || row["Ubicacion"] || "";
+      const u = (row["Ubicación"] || row["Ubicacion"] || "").toString().trim();
       return u === filtros.ubicacion;
     });
   }
 
   // Filtro Genética
-  if (filtros.genetica !== "TODAS") {
+  if (filtros.genetica !== "TODAS" && filtros.genetica) {
     filtrada = filtrada.filter(row => {
-      const g = row["Genética"] || row["Genetica"] || "";
-      return g === filtros.genetica;
+      const gRow = (row["Genética"] || row["Genetica"] || "").toString().trim().toUpperCase();
+
+      if (filtros.genetica === "1050") {
+        // 1050 debe incluir genética 1050 y SUPERCERDA
+        return gRow === "1050" || gRow === "SUPERCERDA";
+      }
+
+      if (filtros.genetica === "1020") {
+        return gRow === "1020";
+      }
+
+      if (filtros.genetica === "SUPERCERDA_ONLY") {
+        return gRow === "SUPERCERDA";
+      }
+
+      return true;
     });
   }
 
   // Filtro Partos
-  if (filtros.partos !== "TODOS") {
+  if (filtros.partos !== "TODOS" && filtros.partos) {
     filtrada = filtrada.filter(row => {
-      const p = row["Partos"];
-      return String(p) === String(filtros.partos);
+      const pRow = row["Partos"];
+      return Number(pRow) === Number(filtros.partos);
     });
   }
 
@@ -355,3 +365,4 @@ function descripcionEstado(estado) {
 
   return `<span class="badge badge-estado ${colorClase}">${desc}</span>`;
 }
+
