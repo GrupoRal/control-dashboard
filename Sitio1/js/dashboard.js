@@ -225,21 +225,22 @@ function sugerirAccion(estado, dias, partos) {
 
 // Badge de color según estado
 function descripcionEstado(estado) {
-  let clase = "badge bg-secondary";
+  let colorClase = "bg-secondary";
 
-  // Colores iguales que antes
   if (estado === "S" || estado === "L" || estado === "W") {
-    clase = "badge bg-success"; // Verde
-  }
-  if (estado === "H" || estado === "N") {
-    clase = "badge bg-warning text-dark"; // Amarillo
-  }
-  if (estado === "A") {
-    clase = "badge bg-danger"; // Rojo
+    colorClase = "bg-success"; // Verde
+  } else if (estado === "H" || estado === "N") {
+    colorClase = "bg-warning text-dark"; // Amarillo
+  } else if (estado === "A") {
+    colorClase = "bg-danger"; // Rojo
   }
 
   const desc = ESTADO_DESCRIPCION[estado] || estado || "-";
 
-  return `<span class="${clase}">${desc}</span>`;
+  // Aquí está la corrección:
+  // badge           → estilo de Bootstrap
+  // badge-estado    → tu estilo personalizado (tamaño)
+  // colorClase      → bg-success / bg-warning / bg-danger
+  return `<span class="badge badge-estado ${colorClase}">${desc}</span>`;
 }
 
