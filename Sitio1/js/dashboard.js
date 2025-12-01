@@ -2,6 +2,16 @@
 const PRODUCTIVE_STATES = ["S", "L", "W"];  // Servidas, Lactantes, Destetadas
 const PROBLEM_STATES   = ["H", "N", "A"];  // Celo no servido, Fallas, Abortadas
 
+const ESTADO_DESCRIPCION = {
+  "S": "Servida",
+  "L": "Lactante",
+  "W": "Destetada",
+  "N": "No preñada (falla servicio)",
+  "A": "Abortada",
+  "H": "Celo no servido"
+};
+
+
 let estadoChart = null;
 
 // Se ejecuta al cargar la página
@@ -166,7 +176,7 @@ function renderizarListaRoja(listaRoja) {
 
     tr.innerHTML = `
       <td>${codigo}</td>
-      <td>${renderBadgeEstado(estado)}</td>
+      <td>${descripcionEstado(estado)}</td>
       <td>${dias}</td>
       <td>${partos}</td>
       <td>${ubicacion}</td>
@@ -214,19 +224,8 @@ function sugerirAccion(estado, dias, partos) {
 }
 
 // Badge de color según estado
-function renderBadgeEstado(estado) {
-  let clase = "bg-secondary";
-
-  if (estado === "S" || estado === "L" || estado === "W") {
-    clase = "bg-success";
-  }
-  if (estado === "H" || estado === "N") {
-    clase = "bg-warning text-dark";
-  }
-  if (estado === "A") {
-    clase = "bg-danger";
-  }
-
-  return `<span class="badge badge-estado ${clase}">${estado}</span>`;
+function descripcionEstado(estado) {
+  const desc = ESTADO_DESCRIPCION[estado] || estado || "-";
+  return `<span>${desc}</span>`;
 }
 
