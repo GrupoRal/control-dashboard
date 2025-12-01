@@ -166,6 +166,7 @@ function aplicarFiltrosYActualizar() {
   // 2) actualizar KPIs y gráficos
   actualizarKPIs(filtrados);
   actualizarCategoria(filtrados);
+  actualizarADGPorEdad(filtrados);
 }
 
 function promedio(arr) {
@@ -272,20 +273,103 @@ function actualizarCategoria(rows) {
   const categorias = Object.keys(cont).sort();
   const kgPorCat = categorias.map(c => cont[c]);
 
-  // Tabla resumen
-  const tbody = document.querySelector('#tabla-categoria tbody');
+  const ctx = document.getElementById('chart-categoria');
+  if (!ctx) return;
+
+  if (chartCategoria) chartCategoria.destroy();
+
+  chartCategoria = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: categorias,
+      datasets: [{
+        label: 'Kg Peso Vivo',
+        data: kgPorCat
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function(ctx2) {
+              const kg = ctx2.raw;
+              const pct = totalKg > 0 ? (kg * 100 / totalKg) : 0;
+              return `${kg.toLocaleString('es-CL', {maximumFractionDigits:0})} kg (${pct.toFixed(1)}%)`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+function actualizarADGPorEdad(rows) {
+  const tbody = document.querySelector('#tabla-adg-edad tbody');
+  if (!tbody) return;
+
   tbody.innerHTML = '';
-  categorias.forEach(cat => {
-    const kg = cont[cat];
-    const pct = totalKg > 0 ? (kg * 100 / totalKg) : 0;
+
+  if (!rows || rows.length === 0) return;
+
+  // Definimos tramos de edad
+  const tramos = [
+    { label: '< 150',    min: 0,   max: 149 },
+    { label: '150–170',  min: 150, max: 170 },
+    { label: '171–190',  min: 171, max: 190 },
+    { label: '> 190',    min: 191, max: Infinity }
+  ];
+
+  const totalKg = rows.reduce((s, r) => s + (r.pesoVivo || 0), 0);
+
+  // Estructura para acumular
+  const resumen = tramos.map(t => ({
+    label: t.label,
+    min: t.min,
+    max: t.max,
+    count: 0,
+    sumADG: 0,
+    sumPeso: 0
+  }));
+
+  rows.forEach(r => {
+    const edad = r.edad;
+    const adg  = r.ganancia;  // asumimos que 'Ganancia' ya es ganancia diaria (kg/día)
+    const peso = r.pesoVivo || 0;
+
+    if (isNaN(edad) || edad <= 0 || isNaN(adg)) return;
+
+    const tramo = resumen.find(t => edad >= t.min && edad <= t.max);
+    if (!tramo) return;
+
+    tramo.count += 1;
+    tramo.sumADG += adg;
+    tramo.sumPeso += peso;
+  });
+
+  resumen.forEach(t => {
+    if (t.count === 0) return;
+
+    const adgProm = t.sumADG / t.count;
+    const pesoProm = t.sumPeso / t.count;
+    const pctKg = totalKg > 0 ? (t.sumPeso * 100 / totalKg) : 0;
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${cat}</td>
-      <td style="text-align:right;">${kg.toLocaleString('es-CL', {maximumFractionDigits:0})}</td>
-      <td style="text-align:right;">${pct.toFixed(1)}%</td>
+      <td>${t.label}</td>
+      <td style="text-align:right;">${t.count}</td>
+      <td style="text-align:right;">${adgProm.toFixed(3)}</td>
+      <td style="text-align:right;">${pesoProm.toFixed(0)}</td>
+      <td style="text-align:right;">${pctKg.toFixed(1)}%</td>
     `;
     tbody.appendChild(tr);
   });
+}
+
+
 
   // Chart
   const ctx = document.getElementById('chart-categoria');
