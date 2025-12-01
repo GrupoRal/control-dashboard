@@ -7,31 +7,32 @@ fetch('data/Rengo.csv')
   .then(texto => {
     const filas = texto.trim().split(/\r?\n/);
     if (filas.length <= 1) {
-      document.getElementById('msg-error').textContent = 'Rengo.csv no tiene datos.';
+      const err = document.getElementById('msg-error');
+      if (err) err.textContent = 'Rengo.csv no tiene datos.';
       return;
     }
 
-    // Detectar separador
+    // Detectar separador ; o ,
     const sep = filas[0].includes(';') ? ';' : ',';
     const headers = filas[0].split(sep).map(h => h.trim());
 
     const idx = nombre => headers.indexOf(nombre);
 
-    const iAnio      = idx('Año');
-    const iMes       = idx('MES');
-    const iSemana    = idx('Semana');
-    const iSourceName= idx('Source.Name');
-    const iSector    = idx('Sector');
-    const iPabellon  = idx('Pabellon');
-    const iPesoVivo  = idx(' Peso Vivo ') !== -1 ? idx(' Peso Vivo ') : idx('Peso Vivo');
-    const iEdad      = idx('Edad');
-    const iGanancia  = idx('Ganancia');
-    const iViajes    = idx('Viajes');
-    const iAgrupa    = idx('Agrupacion CAT LIQ');
+    const iAnio       = idx('Año');
+    const iMes        = idx('MES');
+    const iSemana     = idx('Semana');
+    const iSourceName = idx('Source.Name');
+    const iSector     = idx('Sector');
+    const iPabellon   = idx('Pabellon');
+    const iPesoVivo   = idx(' Peso Vivo ') !== -1 ? idx(' Peso Vivo ') : idx('Peso Vivo');
+    const iEdad       = idx('Edad');
+    const iGanancia   = idx('Ganancia');
+    const iViajes     = idx('Viajes');
+    const iAgrupa     = idx('Agrupacion CAT LIQ');
 
     if (iPesoVivo === -1) {
-      document.getElementById('msg-error').textContent =
-        'No se encontró la columna "Peso Vivo" en Rengo.csv.';
+      const err = document.getElementById('msg-error');
+      if (err) err.textContent = 'No se encontró la columna "Peso Vivo" en Rengo.csv.';
       return;
     }
 
@@ -42,30 +43,27 @@ fetch('data/Rengo.csv')
         const cols = linea.split(sep);
 
         const num = v => {
-          if (!v) return NaN;
+          if (v === undefined || v === null) return NaN;
           return parseFloat(String(v).replace(',', '.'));
         };
 
-        const edad     = iEdad === -1 ? NaN : num(cols[iEdad]);
+        const edad     = iEdad     === -1 ? NaN : num(cols[iEdad]);
         const ganancia = iGanancia === -1 ? NaN : num(cols[iGanancia]);
 
-        const gananciaDiaria =
-          (!isNaN(edad) && edad > 0 && !isNaN(ganancia)) ? (ganancia / edad) : NaN;
-
         return {
-          anio:     iAnio      === -1 ? '' : cols[iAnio].trim(),
-          mes:      iMes       === -1 ? '' : cols[iMes].trim(),
-          semana:   iSemana    === -1 ? '' : cols[iSemana].trim(),
-          sector:   iSector    === -1 ? '' : cols[iSector].trim(),
-          pabellon: iPabellon  === -1 ? '' : cols[iPabellon].trim(),
-          diaLote:  iSourceName=== -1 ? '' : cols[iSourceName].trim(),
+          anio:      iAnio       === -1 ? '' : (cols[iAnio]       || '').trim(),
+          mes:       iMes        === -1 ? '' : (cols[iMes]        || '').trim(),
+          semana:    iSemana     === -1 ? '' : (cols[iSemana]     || '').trim(),
+          sector:    iSector     === -1 ? '' : (cols[iSector]     || '').trim(),
+          pabellon:  iPabellon   === -1 ? '' : (cols[iPabellon]   || '').trim(),
+          diaLote:   iSourceName === -1 ? '' : (cols[iSourceName] || '').trim(),
 
-          pesoVivo: num(cols[iPesoVivo]),
-          edad:     edad,
-          ganancia: ganancia,
+          pesoVivo:  num(cols[iPesoVivo]),
+          edad:      edad,
+          ganancia:  ganancia, // asumimos que ya es kg/día
 
-          viajes:   iViajes === -1 ? NaN : num(cols[iViajes]),
-          categoria: iAgrupa === -1 ? 'Sin dato' : cols[iAgrupa].trim()
+          viajes:    iViajes === -1 ? NaN : num(cols[iViajes]),
+          categoria: iAgrupa === -1 ? 'Sin dato' : (cols[iAgrupa] || '').trim()
         };
       })
       .filter(r => !isNaN(r.pesoVivo)); // solo filas con peso vivo
@@ -75,8 +73,10 @@ fetch('data/Rengo.csv')
   })
   .catch(err => {
     console.error(err);
-    document.getElementById('msg-error').textContent = 'Error al leer Rengo.csv.';
+    const e = document.getElementById('msg-error');
+    if (e) e.textContent = 'Error al leer Rengo.csv.';
   });
+
 
 // ----------- 2. FILTROS ------------------
 
@@ -89,6 +89,8 @@ const selPabellon = document.getElementById('f-pabellon');
 const btnClear    = document.getElementById('btn-clear');
 
 function repoblarSelect(select, valores, textoTodos) {
+  if (!select) return;
+
   const valorAnterior = select.value;
 
   // limpiar opciones
@@ -129,79 +131,87 @@ function poblarFiltrosDinamicos(rows) {
 
 function filtrar(rows) {
   return rows.filter(r =>
-    (selAnio.value    === 'all' || r.anio    === selAnio.value) &&
-    (selMes.value     === 'all' || r.mes     === selMes.value) &&
-    (selSemana.value  === 'all' || r.semana  === selSemana.value) &&
-    (selDiaLote.value === 'all' || r.diaLote === selDiaLote.value) &&
-    (selSector.value  === 'all' || r.sector  === selSector.value) &&
-    (selPabellon.value=== 'all' || r.pabellon=== selPabellon.value)
+    (!selAnio    || selAnio.value    === 'all' || r.anio    === selAnio.value) &&
+    (!selMes     || selMes.value     === 'all' || r.mes     === selMes.value) &&
+    (!selSemana  || selSemana.value  === 'all' || r.semana  === selSemana.value) &&
+    (!selDiaLote || selDiaLote.value === 'all' || r.diaLote === selDiaLote.value) &&
+    (!selSector  || selSector.value  === 'all' || r.sector  === selSector.value) &&
+    (!selPabellon|| selPabellon.value=== 'all' || r.pabellon=== selPabellon.value)
   );
 }
 
-selAnio.onchange =
-selMes.onchange =
-selSemana.onchange =
-selDiaLote.onchange =
-selSector.onchange =
-selPabellon.onchange = aplicarFiltrosYActualizar;
+if (selAnio) {
+  selAnio.onchange =
+  selMes.onchange =
+  selSemana.onchange =
+  selDiaLote.onchange =
+  selSector.onchange =
+  selPabellon.onchange = aplicarFiltrosYActualizar;
+}
 
-btnClear.onclick = () => {
-  selAnio.value     = 'all';
-  selMes.value      = 'all';
-  selSemana.value   = 'all';
-  selDiaLote.value  = 'all';
-  selSector.value   = 'all';
-  selPabellon.value = 'all';
-  aplicarFiltrosYActualizar();
-};
+if (btnClear) {
+  btnClear.onclick = () => {
+    if (selAnio)     selAnio.value     = 'all';
+    if (selMes)      selMes.value      = 'all';
+    if (selSemana)   selSemana.value   = 'all';
+    if (selDiaLote)  selDiaLote.value  = 'all';
+    if (selSector)   selSector.value   = 'all';
+    if (selPabellon) selPabellon.value = 'all';
+    aplicarFiltrosYActualizar();
+  };
+}
+
 
 // ----------- 3. CÁLCULOS Y GRÁFICOS ------------------
 
 function aplicarFiltrosYActualizar() {
   const filtrados = filtrar(datosOriginales);
 
-  // 1) repoblar filtros según los datos que quedan
+  // repoblar filtros según lo que queda
   poblarFiltrosDinamicos(filtrados);
 
-  // 2) actualizar KPIs y gráficos
+  // actualizar KPIs y vista
   actualizarKPIs(filtrados);
   actualizarCategoria(filtrados);
   actualizarADGPorEdad(filtrados);
 }
 
 function promedio(arr) {
-  if (!arr.length) return NaN;
+  if (!arr || !arr.length) return NaN;
   return arr.reduce((a, b) => a + b, 0) / arr.length;
 }
 
 function actualizarKPIs(rows) {
-  const kgTotales = rows.reduce((s, r) => s + r.pesoVivo, 0);
+  const kgTotales = rows.reduce((s, r) => s + (r.pesoVivo || 0), 0);
   const viajesTot = rows.reduce((s, r) => s + (isNaN(r.viajes) ? 0 : r.viajes), 0);
   const kgViaje   = viajesTot > 0 ? kgTotales / viajesTot : NaN;
 
-  const pesoProm   = promedio(rows.map(r => r.pesoVivo));
-  const edadProm   = promedio(rows.map(r => (isNaN(r.edad) ? 0 : r.edad)));
+  const pesoProm     = promedio(rows.map(r => r.pesoVivo || 0));
+  const edadProm     = promedio(rows.map(r => (isNaN(r.edad) ? 0 : r.edad)));
   const gananciaProm = promedio(rows.map(r => (isNaN(r.ganancia) ? 0 : r.ganancia)));
 
   const fmtKg = v =>
     isNaN(v) ? 'N/D' : v.toLocaleString('es-CL', { maximumFractionDigits: 0 });
   const fmt = v => (isNaN(v) ? 'N/D' : v.toFixed(2));
 
-  document.getElementById('kpi-kg-totales').textContent = fmtKg(kgTotales);
-  document.getElementById('kpi-viajes').textContent =
-    isNaN(viajesTot) ? 'N/D' : viajesTot.toFixed(0);
-  document.getElementById('kpi-kg-viaje').textContent =
-    isNaN(kgViaje) ? 'N/D' : kgViaje.toFixed(0);
+  const elKgTotal  = document.getElementById('kpi-kg-totales');
+  const elViajes   = document.getElementById('kpi-viajes');
+  const elKgViaje  = document.getElementById('kpi-kg-viaje');
+  const elPesoProm = document.getElementById('kpi-peso-prom');
+  const elEdadProm = document.getElementById('kpi-edad-prom');
+  const elGDP      = document.getElementById('kpi-ganancia-prom');
 
-  document.getElementById('kpi-peso-prom').textContent = fmt(pesoProm) + ' kg';
-  document.getElementById('kpi-edad-prom').textContent =
+  if (elKgTotal)  elKgTotal.textContent  = fmtKg(kgTotales);
+  if (elViajes)   elViajes.textContent   = isNaN(viajesTot) ? 'N/D' : viajesTot.toFixed(0);
+  if (elKgViaje)  elKgViaje.textContent  = isNaN(kgViaje) ? 'N/D' : kgViaje.toFixed(0);
+  if (elPesoProm) elPesoProm.textContent = fmt(pesoProm) + ' kg';
+  if (elEdadProm) elEdadProm.textContent =
     isNaN(edadProm) ? 'N/D' : edadProm.toFixed(0) + ' días';
-  document.getElementById('kpi-ganancia-prom').textContent =
-    isNaN(gananciaProm) ? 'N/D' : gananciaProm.toFixed(2);
+  if (elGDP)      elGDP.textContent      =
+    isNaN(gananciaProm) ? 'N/D' : gananciaProm.toFixed(3);
 
   // --- CÁLCULO DE CASTIGOS 8% y 40% ---
-  // OJO: ajusta los nombres si en tu CSV las categorías se llaman distinto
-  // por ejemplo "CASTIGO 8%" o "DESCUENTO 8", etc.
+
   const esCastigo8 = cat => {
     const c = (cat || '').trim().toUpperCase();
     return c === 'CASTIGO 8%';
@@ -227,9 +237,9 @@ function actualizarKPIs(rows) {
   const kgCastigos = kgCastigo8 + kgCastigo40;
   const pctCastigos = kgTotales > 0 ? (kgCastigos * 100 / kgTotales) : 0;
 
-  const elPct = document.getElementById('kpi-pct-castigos');
-  const elKg = document.getElementById('kpi-kg-castigos');
-  const elDet = document.getElementById('kpi-detalle-castigos');
+  const elPct   = document.getElementById('kpi-pct-castigos');
+  const elKgC   = document.getElementById('kpi-kg-castigos');
+  const elDet   = document.getElementById('kpi-detalle-castigos');
   const elAlert = document.getElementById('kpi-alerta-castigos');
 
   if (elPct) {
@@ -238,8 +248,8 @@ function actualizarKPIs(rows) {
       : pctCastigos.toFixed(1) + ' %';
   }
 
-  if (elKg) {
-    elKg.textContent = fmtKg(kgCastigos);
+  if (elKgC) {
+    elKgC.textContent = fmtKg(kgCastigos);
   }
 
   if (elDet) {
@@ -256,9 +266,10 @@ function actualizarKPIs(rows) {
       elAlert.style.color = '#2e7d32';   // verde
     }
   }
-  
 }
 
+
+// Gráfico por categoría (Agrupacion CAT LIQ)
 function actualizarCategoria(rows) {
   const cont = {};
   let totalKg = 0;
@@ -266,8 +277,8 @@ function actualizarCategoria(rows) {
   rows.forEach(r => {
     const cat = r.categoria && r.categoria !== '' ? r.categoria : 'Sin dato';
     if (!cont[cat]) cont[cat] = 0;
-    cont[cat] += r.pesoVivo;
-    totalKg += r.pesoVivo;
+    cont[cat] += r.pesoVivo || 0;
+    totalKg += r.pesoVivo || 0;
   });
 
   const categorias = Object.keys(cont).sort();
@@ -307,25 +318,25 @@ function actualizarCategoria(rows) {
   });
 }
 
-function actualizarADGPorEdad(rows) {
-  const tbody = document.querySelector('#tabla-adg-edad tbody');
-  if (!tbody) return;
 
-  tbody.innerHTML = '';
+// Tabla: Ganancia diaria por rango de edad
+function actualizarADGPorEdad(rows) {
+  const tabla = document.querySelector('#tabla-adg-edad tbody');
+  if (!tabla) return;
+
+  tabla.innerHTML = '';
 
   if (!rows || rows.length === 0) return;
 
-  // Definimos tramos de edad
   const tramos = [
-    { label: '< 150',    min: 0,   max: 149 },
-    { label: '150–170',  min: 150, max: 170 },
-    { label: '171–190',  min: 171, max: 190 },
-    { label: '> 190',    min: 191, max: Infinity }
+    { label: '< 150',   min: 0,   max: 149 },
+    { label: '150–170', min: 150, max: 170 },
+    { label: '171–190', min: 171, max: 190 },
+    { label: '> 190',   min: 191, max: Infinity }
   ];
 
   const totalKg = rows.reduce((s, r) => s + (r.pesoVivo || 0), 0);
 
-  // Estructura para acumular
   const resumen = tramos.map(t => ({
     label: t.label,
     min: t.min,
@@ -337,7 +348,7 @@ function actualizarADGPorEdad(rows) {
 
   rows.forEach(r => {
     const edad = r.edad;
-    const adg  = r.ganancia;  // asumimos que 'Ganancia' ya es ganancia diaria (kg/día)
+    const adg  = r.ganancia;  // asumimos ganancia diaria kg/día
     const peso = r.pesoVivo || 0;
 
     if (isNaN(edad) || edad <= 0 || isNaN(adg)) return;
@@ -345,17 +356,17 @@ function actualizarADGPorEdad(rows) {
     const tramo = resumen.find(t => edad >= t.min && edad <= t.max);
     if (!tramo) return;
 
-    tramo.count += 1;
-    tramo.sumADG += adg;
+    tramo.count   += 1;
+    tramo.sumADG  += adg;
     tramo.sumPeso += peso;
   });
 
   resumen.forEach(t => {
     if (t.count === 0) return;
 
-    const adgProm = t.sumADG / t.count;
-    const pesoProm = t.sumPeso / t.count;
-    const pctKg = totalKg > 0 ? (t.sumPeso * 100 / totalKg) : 0;
+    const adgProm   = t.sumADG / t.count;
+    const pesoProm  = t.sumPeso / t.count;
+    const pctKg     = totalKg > 0 ? (t.sumPeso * 100 / totalKg) : 0;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -365,42 +376,6 @@ function actualizarADGPorEdad(rows) {
       <td style="text-align:right;">${pesoProm.toFixed(0)}</td>
       <td style="text-align:right;">${pctKg.toFixed(1)}%</td>
     `;
-    tbody.appendChild(tr);
+    tabla.appendChild(tr);
   });
 }
-
-
-
-  // Chart
-  const ctx = document.getElementById('chart-categoria');
-  if (chartCategoria) chartCategoria.destroy();
-
-  chartCategoria = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: categorias,
-      datasets: [{
-        label: 'Kg Peso Vivo',
-        data: kgPorCat
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: function(ctx2) {
-              const kg = ctx2.raw;
-              const pct = totalKg > 0 ? (kg * 100 / totalKg) : 0;
-              return `${kg.toLocaleString('es-CL', {maximumFractionDigits:0})} kg (${pct.toFixed(1)}%)`;
-            }
-          }
-        }
-      },
-      scales: {
-        y: { beginAtZero: true }
-      }
-    }
-  });
-}
-
