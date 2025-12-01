@@ -202,13 +202,13 @@ function actualizarKPIs(rows) {
   // OJO: ajusta los nombres si en tu CSV las categorías se llaman distinto
   // por ejemplo "CASTIGO 8%" o "DESCUENTO 8", etc.
   const esCastigo8 = cat => {
-    const c = (cat || '').toUpperCase();
-    return c.includes('CASTIGO') && c.includes('8');
+    const c = (cat || '').trim().toUpperCase();
+    return c === 'CASTIGO 8%';
   };
 
   const esCastigo40 = cat => {
-    const c = (cat || '').toUpperCase();
-    return c.includes('CASTIGO') && c.includes('40');
+    const c = (cat || '').trim().toUpperCase();
+    return c === 'CASTIGO 40%';
   };
 
   let kgCastigo8 = 0;
