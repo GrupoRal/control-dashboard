@@ -2,51 +2,91 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Red de Control - Marcelo</title>
+    <title>Red de Control – Marcelo</title>
+
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #eef1f5;
             margin: 0;
-            padding: 40px;
+            padding: 40px 20px;
+            color: #333;
         }
-        h1 {
-            margin-bottom: 10px;
-        }
+
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: auto;
         }
-        .card {
-            background: white;
-            padding: 16px;
-            margin: 8px 0;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+
+        h1 {
+            margin-bottom: 5px;
+            font-weight: 700;
+            color: #233043;
         }
-        a {
+
+        p.subtitle {
+            color: #556;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #fff;
+            padding: 20px 22px;
+            margin: 14px 0;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: transform 0.1s ease-in-out;
+            border-left: 5px solid #4a90e2;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        .card a {
+            font-size: 1.2rem;
+            color: #233043;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 600;
+        }
+
+        .card p {
+            margin: 6px 0 0 0;
+            color: #666;
+        }
+
+        .coming-soon {
+            opacity: 0.5;
         }
     </style>
+
 </head>
 <body>
-<div class="container">
-    <h1>Red de Control – Marcelo</h1>
-    <p>Selecciona un dashboard:</p>
 
-    
+<div class="container">
+    <h1>Red de Control</h1>
+    <p class="subtitle">Dashboards operacionales y reproductivos</p>
+
+    <!-- Dashboard Engorda -->
     <div class="card">
         <a href="engorda/index.html">🐷 Dashboard Engorda – Rengo</a>
-        <p>Engorda basada en Peso Vivo, Edad y Eficiencia desde Rengo.csv.</p>
+        <p>Análisis de Peso Vivo, Edad y Eficiencia de engorda.</p>
     </div>
 
-
+    <!-- Dashboard Reproductoras (NUEVO) -->
     <div class="card">
+        <a href="Sitio1/index.html">👑 Sitio 1 – Dashboard Reproductoras</a>
+        <p>Estado actual de madres, Lista Roja y KPIs Reproductivos.</p>
+    </div>
+
+    <!-- Costos -->
+    <div class="card coming-soon">
         <a href="#">💰 Dashboard Costos (próximamente)</a>
     </div>
 
-
 </div>
+
 </body>
 </html>
+
