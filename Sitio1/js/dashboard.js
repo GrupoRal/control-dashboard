@@ -11,7 +11,7 @@ const ESTADO_DESCRIPCION = {
   "H": "Celo no servido"
 };
 
-// Ventanas biológicas (puedes ajustar estos valores si cambian criterios)
+// Ventanas biológicas
 const MAX_GESTACION_DIAS = 114;    // S: días desde servicio
 const MAX_LACTANCIA_DIAS = 23;     // L: días de lactancia
 const MAX_W_LDC_DIAS     = 5;      // W en LDC
@@ -19,16 +19,25 @@ const MAX_W_ML_1020_DIAS = 7;      // W en ML con genética 1020
 const MAX_W_OTROS_DIAS   = 5;      // W otros casos
 
 let estadoChart = null;
-let dataGlobal = [];   // aquí guardamos todo el CSV
+let dataGlobal = [];   // CSV completo
 let filtros = {
   ubicacion: "TODOS",
   genetica: "TODAS",
   partos: "TODOS"
 };
 
+// Para detalle de ventanas biológicas
+let detalleVentanas = {
+  gestacionPasada: [],
+  lactanciaLarga: [],
+  desteteFuera: []
+};
+let tipoVentanaSeleccionado = "TODAS"; // GESTACION, LACTANCIA, DESTETE, TODAS
+
 // Se ejecuta al cargar la página
 document.addEventListener("DOMContentLoaded", () => {
   cargarDatosCSV("data/estado_madres_actual.csv");
+  inicializarClicksTarjetas();
 });
 
 // Leer CSV usando PapaParse
@@ -114,6 +123,37 @@ function inicializarFiltros(data) {
   }
 }
 
+// Inicializar clicks en tarjetas de ventanas biológicas
+function inicializarClicksTarjetas() {
+  const cardGest = document.getElementById("card-gestacion-pasada");
+  const cardLact = document.getElementById("card-lactancia-larga");
+  const cardDest = document.getElementById("card-destete-fuera");
+
+  if (cardGest) {
+    cardGest.addEventListener("click", () => {
+      tipoVentanaSeleccionado =
+        tipoVentanaSeleccionado === "GESTACION" ? "TODAS" : "GESTACION";
+      renderizarTablaVentanas();
+    });
+  }
+
+  if (cardLact) {
+    cardLact.addEventListener("click", () => {
+      tipoVentanaSeleccionado =
+        tipoVentanaSeleccionado === "LACTANCIA" ? "TODAS" : "LACTANCIA";
+      renderizarTablaVentanas();
+    });
+  }
+
+  if (cardDest) {
+    cardDest.addEventListener("click", () => {
+      tipoVentanaSeleccionado =
+        tipoVentanaSeleccionado === "DESTETE" ? "TODAS" : "DESTETE";
+      renderizarTablaVentanas();
+    });
+  }
+}
+
 // Aplica filtros sobre dataGlobal y refresca dashboard
 function aplicarFiltrosYActualizar() {
   let filtrada = dataGlobal.slice();
@@ -169,8 +209,10 @@ function procesarDatosFiltrados(data) {
       listaRojaCount: 0
     });
     actualizarVentanasBiologicas(0, 0, 0);
+    detalleVentanas = { gestacionPasada: [], lactanciaLarga: [], desteteFuera: [] };
     renderizarGraficoEstados({});
     renderizarListaRoja([]);
+    renderizarTablaVentanas();
     return;
   }
 
@@ -198,17 +240,20 @@ function procesarDatosFiltrados(data) {
     listaRojaCount: listaRoja.length
   });
 
-  // Cálculo de ventanas biológicas
+  // Cálculo de ventanas biológicas + detalle
   const {
     gestacionPasada,
     lactanciaLarga,
-    desteteFuera
+    desteteFuera,
+    detalle
   } = calcularVentanasBiologicas(data);
 
+  detalleVentanas = detalle;
   actualizarVentanasBiologicas(gestacionPasada, lactanciaLarga, desteteFuera);
 
   renderizarGraficoEstados(conteoEstados);
   renderizarListaRoja(listaRoja);
+  renderizarTablaVentanas();
 }
 
 // Suma los estados indicados
@@ -216,7 +261,7 @@ function sumarPorEstados(conteoEstados, estados) {
   return estados.reduce((acc, est) => acc + (conteoEstados[est] || 0), 0);
 }
 
-// Actualiza las tarjetas KPI
+// Actualiza las tarjetas KPI principales
 function actualizarKPIs({ total, totalProductivas, totalImproductivas, listaRojaCount }) {
   const kpiTotal = document.getElementById("kpi-total");
   const kpiProductivas = document.getElementById("kpi-productivas");
@@ -233,11 +278,17 @@ function actualizarKPIs({ total, totalProductivas, totalImproductivas, listaRoja
   kpiListaRoja.textContent = listaRojaCount;
 }
 
-// Calcula hembras fuera de ventana biológica
+// Calcula hembras fuera de ventana biológica + detalle
 function calcularVentanasBiologicas(data) {
   let gestacionPasada = 0;
   let lactanciaLarga = 0;
   let desteteFuera = 0;
+
+  const detalle = {
+    gestacionPasada: [],
+    lactanciaLarga: [],
+    desteteFuera: []
+  };
 
   data.forEach(row => {
     const estado = (row["Estado"] || "").toString().trim().toUpperCase();
@@ -248,11 +299,13 @@ function calcularVentanasBiologicas(data) {
     // Servidas con más de 114 días
     if (estado === "S" && dias > MAX_GESTACION_DIAS) {
       gestacionPasada++;
+      detalle.gestacionPasada.push({ ...row, _tipo: "Gestación > 114 días" });
     }
 
     // Lactantes con más de 23 días
     if (estado === "L" && dias > MAX_LACTANCIA_DIAS) {
       lactanciaLarga++;
+      detalle.lactanciaLarga.push({ ...row, _tipo: "Lactancia > 23 días" });
     }
 
     // Destetadas fuera de la ventana según reglas
@@ -267,11 +320,12 @@ function calcularVentanasBiologicas(data) {
 
       if (dias > maxDiasPermitidos) {
         desteteFuera++;
+        detalle.desteteFuera.push({ ...row, _tipo: "Destetada fuera de ventana" });
       }
     }
   });
 
-  return { gestacionPasada, lactanciaLarga, desteteFuera };
+  return { gestacionPasada, lactanciaLarga, desteteFuera, detalle };
 }
 
 // Actualiza tarjetas de ventanas biológicas
@@ -285,7 +339,7 @@ function actualizarVentanasBiologicas(gestacionPasada, lactanciaLarga, desteteFu
   if (kDest) kDest.textContent = desteteFuera;
 }
 
-// Gráfico de barras por estado
+// Renderizar gráfico de barras por estado
 function renderizarGraficoEstados(conteoEstados) {
   const ctx = document.getElementById("estadoChart").getContext("2d");
 
@@ -344,6 +398,7 @@ function renderizarGraficoEstados(conteoEstados) {
 // Renderiza la tabla de lista roja (H + N + A)
 function renderizarListaRoja(listaRoja) {
   const tbody = document.getElementById("tabla-lista-roja");
+  if (!tbody) return;
   tbody.innerHTML = "";
 
   // Orden: por estado y luego por días (desc)
@@ -380,6 +435,68 @@ function renderizarListaRoja(listaRoja) {
       <td>${accion}</td>
     `;
 
+    tbody.appendChild(tr);
+  });
+}
+
+// Renderiza la tabla de detalle de ventanas biológicas
+function renderizarTablaVentanas() {
+  const tbody = document.getElementById("tabla-ventanas");
+  const label = document.getElementById("label-detalle-ventanas");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  let filas = [];
+  let texto = "Mostrando: todas las categorías";
+
+  if (tipoVentanaSeleccionado === "GESTACION") {
+    filas = detalleVentanas.gestacionPasada;
+    texto = "Mostrando: Gestación > 114 días";
+  } else if (tipoVentanaSeleccionado === "LACTANCIA") {
+    filas = detalleVentanas.lactanciaLarga;
+    texto = "Mostrando: Lactancia > 23 días";
+  } else if (tipoVentanaSeleccionado === "DESTETE") {
+    filas = detalleVentanas.desteteFuera;
+    texto = "Mostrando: Destetadas fuera de ventana";
+  } else {
+    filas = [
+      ...detalleVentanas.gestacionPasada,
+      ...detalleVentanas.lactanciaLarga,
+      ...detalleVentanas.desteteFuera
+    ];
+  }
+
+  if (label) label.textContent = texto;
+
+  // Orden sencillo: por tipo y luego por días desc
+  filas.sort((a, b) => {
+    const tA = (a._tipo || "").localeCompare(b._tipo || "");
+    if (tA !== 0) return tA;
+    return (b["Dia Proceso"] || 0) - (a["Dia Proceso"] || 0);
+  });
+
+  filas.forEach(row => {
+    const estado = (row["Estado"] || "").toString().trim().toUpperCase();
+    const dias = row["Dia Proceso"] || 0;
+    const partos = row["Partos"] || 0;
+    const codigo = row["Código"] || row["Codigo"] || "";
+    const ubicacion = row["Ubicación"] || row["Ubicacion"] || "";
+    const genetica = row["Genética"] || row["Genetica"] || "";
+    const grupo = row["Grupo"] || "";
+    const tipo = row._tipo || "";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${codigo}</td>
+      <td>${descripcionEstado(estado)}</td>
+      <td>${dias}</td>
+      <td>${partos}</td>
+      <td>${ubicacion}</td>
+      <td>${genetica}</td>
+      <td>${grupo}</td>
+      <td>${tipo}</td>
+    `;
     tbody.appendChild(tr);
   });
 }
@@ -434,4 +551,5 @@ function descripcionEstado(estado) {
 
   return `<span class="badge badge-estado ${colorClase}">${desc}</span>`;
 }
+
 
