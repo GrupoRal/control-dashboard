@@ -197,6 +197,65 @@ function actualizarKPIs(rows) {
     isNaN(edadProm) ? 'N/D' : edadProm.toFixed(0) + ' días';
   document.getElementById('kpi-ganancia-prom').textContent =
     isNaN(gananciaProm) ? 'N/D' : gananciaProm.toFixed(2);
+
+  // --- CÁLCULO DE CASTIGOS 8% y 40% ---
+  // OJO: ajusta los nombres si en tu CSV las categorías se llaman distinto
+  // por ejemplo "CASTIGO 8%" o "DESCUENTO 8", etc.
+  const esCastigo8 = cat => {
+    const c = (cat || '').toUpperCase();
+    return c.includes('CASTIGO') && c.includes('8');
+  };
+
+  const esCastigo40 = cat => {
+    const c = (cat || '').toUpperCase();
+    return c.includes('CASTIGO') && c.includes('40');
+  };
+
+  let kgCastigo8 = 0;
+  let kgCastigo40 = 0;
+
+  rows.forEach(r => {
+    const cat = r.categoria || '';
+    if (esCastigo8(cat)) {
+      kgCastigo8 += r.pesoVivo || 0;
+    } else if (esCastigo40(cat)) {
+      kgCastigo40 += r.pesoVivo || 0;
+    }
+  });
+
+  const kgCastigos = kgCastigo8 + kgCastigo40;
+  const pctCastigos = kgTotales > 0 ? (kgCastigos * 100 / kgTotales) : 0;
+
+  const elPct = document.getElementById('kpi-pct-castigos');
+  const elKg = document.getElementById('kpi-kg-castigos');
+  const elDet = document.getElementById('kpi-detalle-castigos');
+  const elAlert = document.getElementById('kpi-alerta-castigos');
+
+  if (elPct) {
+    elPct.textContent = isNaN(pctCastigos)
+      ? 'N/D'
+      : pctCastigos.toFixed(1) + ' %';
+  }
+
+  if (elKg) {
+    elKg.textContent = fmtKg(kgCastigos);
+  }
+
+  if (elDet) {
+    elDet.textContent =
+      `8%: ${fmtKg(kgCastigo8)} kg | 40%: ${fmtKg(kgCastigo40)} kg`;
+  }
+
+  if (elAlert) {
+    if (pctCastigos > 5) {
+      elAlert.textContent = '⚠ Sobre meta';
+      elAlert.style.color = '#e53935';   // rojo
+    } else {
+      elAlert.textContent = 'OK';
+      elAlert.style.color = '#2e7d32';   // verde
+    }
+  }
+  
 }
 
 function actualizarCategoria(rows) {
