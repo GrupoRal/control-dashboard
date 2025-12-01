@@ -83,33 +83,51 @@
 
 
      <!-- FILTROS -->
-    <section class="mb-3">
-      <div class="card kpi-card p-3">
-        <div class="row g-3 align-items-end">
-          <div class="col-md-4">
-            <label for="filtro-ubicacion" class="form-label mb-1">Ubicación</label>
-            <select id="filtro-ubicacion" class="form-select form-select-sm">
-              <option value="TODOS">Todas</option>
-              <!-- Se rellena desde JS -->
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label for="filtro-genetica" class="form-label mb-1">Genética</label>
-            <select id="filtro-genetica" class="form-select form-select-sm">
-              <option value="TODAS">Todas</option>
-              <!-- Se rellena desde JS -->
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label for="filtro-partos" class="form-label mb-1">Partos</label>
-            <select id="filtro-partos" class="form-select form-select-sm">
-              <option value="TODOS">Todos</option>
-              <!-- Se rellena desde JS -->
-            </select>
-          </div>
+<section class="mb-3">
+  <div class="card kpi-card p-3">
+
+    <!-- FILTROS PRINCIPALES -->
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label for="filtro-ubicacion" class="form-label mb-1">Ubicación</label>
+        <select id="filtro-ubicacion" class="form-select form-select-sm">
+          <option value="TODOS">Todas</option>
+          <!-- Se rellena desde JS -->
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <label for="filtro-genetica" class="form-label mb-1">Genética</label>
+        <select id="filtro-genetica" class="form-select form-select-sm">
+          <option value="TODAS">Todas</option>
+          <!-- Se rellena desde JS -->
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <label for="filtro-partos" class="form-label mb-1">Partos</label>
+        <select id="filtro-partos" class="form-select form-select-sm">
+          <option value="TODOS">Todos</option>
+          <!-- Se rellena desde JS -->
+        </select>
+      </div>
+    </div>
+
+    <!-- BUSCADOR DE HEMBRA POR CÓDIGO -->
+    <div class="row g-3 align-items-end mt-3">
+      <div class="col-md-6 col-lg-4">
+        <label for="busqueda-codigo" class="form-label mb-1">Buscar hembra por código</label>
+        <div class="input-group input-group-sm">
+          <input id="busqueda-codigo" type="text" class="form-control" placeholder="Ej: C5048">
+          <button id="btn-buscar-codigo" class="btn btn-outline-secondary" type="button">
+            Buscar
+          </button>
         </div>
       </div>
-    </section>
+    </div>
+
+  </div>
+</section>
 
     <!-- KPIs -->
     <section class="mb-4">
