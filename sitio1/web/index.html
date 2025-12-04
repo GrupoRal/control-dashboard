@@ -62,6 +62,17 @@
       canvas{height:260px !important}
       .kpi { min-width:140px }
     }
+    
+/* colores para indicadores de cumplimiento */
+.kpi.meets { border-left: 6px solid #2b8f45; }   /* verde */
+.kpi.below  { border-left: 6px solid #c0392b; }  /* rojo */
+
+/* opcional: cambiar color del número dentro de la tarjeta */
+.kpi.meets .value { color: #2b8f45; }
+.kpi.below .value  { color: #c0392b; }
+
+
+    
   </style>
 </head>
 <body>
@@ -72,7 +83,7 @@
     </header>
 
     <div id="top">
-     <!-- KPI cards (reemplazar la sección anterior) -->
+    <!-- KPI cards (reemplazo) -->
 <div class="kpi-row">
   <div id="card_services" class="kpi">
     <small>Total inseminaciones (promedio últimas 10s)</small>
@@ -81,6 +92,31 @@
       Meta semanal: <strong id="meta_services">91</strong>
     </div>
   </div>
+
+  <div id="card_birthings" class="kpi">
+    <small>Total partos (promedio últimas 10s)</small>
+    <div id="kpi_birthings" class="value">—</div>
+    <div style="margin-top:6px;font-size:12px;color:var(--muted)">
+      Meta semanal: <strong id="meta_birthings">83</strong>
+    </div>
+  </div>
+
+  <div id="card_nweaned" class="kpi">
+    <small>Total destetes (promedio últimas 10s)</small>
+    <div id="kpi_nweaned" class="value">—</div>
+    <div style="margin-top:6px;font-size:12px;color:var(--muted)">
+      Meta semanal: <strong id="meta_nweaned">1132</strong>
+    </div>
+  </div>
+
+  <div class="kpi">
+    <small>Piglets / parto · Conv. proxy</small>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div id="kpi_ppp" class="value">—</div>
+      <div id="kpi_conv" class="value" style="font-size:15px;color:var(--muted)">—</div>
+    </div>
+  </div>
+</div>
 
   <div id="card_birthings" class="kpi">
     <small>Total partos (promedio últimas 10s)</small>
@@ -193,6 +229,55 @@
         const birth = datos.map(d => Number(d.birthings||0));
         const wean = datos.map(d => Number(d.nweaned||0));
 
+        // --- promedio últimas 10 semanas + metas + coloreo ---
+        function avgLastN(arr, n=10) {
+          if (!Array.isArray(arr) || arr.length === 0) return 0;
+          const sliceArr = arr.slice(-n);
+          const sum = sliceArr.reduce((s,v)=>s + (Number(v)||0), 0);
+          return sliceArr.length ? (sum / sliceArr.length) : 0;
+        }
+        
+        const TARGETS = {
+          services: 91,
+          birthings: 83,
+          nweaned: 1132
+        };
+        
+        const avgServices10 = avgLastN(serv, 10);
+        const avgBirth10 = avgLastN(birth, 10);
+        const avgWean10 = avgLastN(wean, 10);
+        
+        const fmt = v => Math.round(v).toLocaleString();
+        
+        document.getElementById('kpi_services').textContent = fmt(avgServices10);
+        document.getElementById('kpi_birthings').textContent = fmt(avgBirth10);
+        document.getElementById('kpi_nweaned').textContent = fmt(avgWean10);
+        
+        // aplicar color a tarjetas (add class meets o below)
+        function applyColor(cardId, avgValue, target) {
+          const card = document.getElementById(cardId);
+          if (!card) return;
+          card.classList.remove('meets','below');
+          if (avgValue >= target) card.classList.add('meets');
+          else card.classList.add('below');
+        }
+        
+        applyColor('card_services', avgServices10, TARGETS.services);
+        applyColor('card_birthings', avgBirth10, TARGETS.birthings);
+        applyColor('card_nweaned', avgWean10, TARGETS.nweaned);
+        
+        // mantener piglets/parto y conv proxy
+        const totalServ = serv.reduce((s,v)=>s+v,0);
+        const totalBirth = birth.reduce((s,v)=>s+v,0);
+        const totalWean = wean.reduce((s,v)=>s+v,0);
+        
+        const pigletsPerBirth = totalBirth ? (totalWean / totalBirth) : 0;
+        const conceptionProxy = totalServ ? (totalBirth / totalServ) : 0;
+        
+        document.getElementById('kpi_ppp').textContent = pigletsPerBirth ? pigletsPerBirth.toFixed(2) + ' piglets/parto' : '-';
+        document.getElementById('kpi_conv').textContent = conceptionProxy ? ((conceptionProxy*100).toFixed(1) + '%') : '-';
+
+        
         // KPIs
         const totalServ = serv.reduce((s,v)=>s+v,0);
         const totalBirth = birth.reduce((s,v)=>s+v,0);
