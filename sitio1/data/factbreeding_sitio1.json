@@ -1,1 +1,866 @@
-[]
+[
+  {
+    "date": "202310",
+    "services": 97,
+    "birthings": 91,
+    "nweaned": 845
+  },
+  {
+    "date": "202311",
+    "services": 80,
+    "birthings": 76,
+    "nweaned": 1073
+  },
+  {
+    "date": "202312",
+    "services": 105,
+    "birthings": 72,
+    "nweaned": 1228
+  },
+  {
+    "date": "202313",
+    "services": 90,
+    "birthings": 74,
+    "nweaned": 1074
+  },
+  {
+    "date": "202314",
+    "services": 84,
+    "birthings": 78,
+    "nweaned": 1089
+  },
+  {
+    "date": "202315",
+    "services": 100,
+    "birthings": 89,
+    "nweaned": 796
+  },
+  {
+    "date": "202316",
+    "services": 62,
+    "birthings": 95,
+    "nweaned": 1089
+  },
+  {
+    "date": "202317",
+    "services": 90,
+    "birthings": 73,
+    "nweaned": 1117
+  },
+  {
+    "date": "202318",
+    "services": 87,
+    "birthings": 87,
+    "nweaned": 1070
+  },
+  {
+    "date": "202319",
+    "services": 97,
+    "birthings": 87,
+    "nweaned": 1088
+  },
+  {
+    "date": "202320",
+    "services": 98,
+    "birthings": 90,
+    "nweaned": 1219
+  },
+  {
+    "date": "202321",
+    "services": 95,
+    "birthings": 61,
+    "nweaned": 1052
+  },
+  {
+    "date": "202322",
+    "services": 89,
+    "birthings": 87,
+    "nweaned": 1115
+  },
+  {
+    "date": "202323",
+    "services": 103,
+    "birthings": 82,
+    "nweaned": 1046
+  },
+  {
+    "date": "202324",
+    "services": 103,
+    "birthings": 73,
+    "nweaned": 1036
+  },
+  {
+    "date": "202325",
+    "services": 95,
+    "birthings": 77,
+    "nweaned": 1160
+  },
+  {
+    "date": "202326",
+    "services": 99,
+    "birthings": 87,
+    "nweaned": 1079
+  },
+  {
+    "date": "202327",
+    "services": 90,
+    "birthings": 76,
+    "nweaned": 1022
+  },
+  {
+    "date": "202328",
+    "services": 85,
+    "birthings": 87,
+    "nweaned": 935
+  },
+  {
+    "date": "202329",
+    "services": 90,
+    "birthings": 83,
+    "nweaned": 963
+  },
+  {
+    "date": "202330",
+    "services": 95,
+    "birthings": 84,
+    "nweaned": 1033
+  },
+  {
+    "date": "202331",
+    "services": 89,
+    "birthings": 84,
+    "nweaned": 1123
+  },
+  {
+    "date": "202332",
+    "services": 101,
+    "birthings": 68,
+    "nweaned": 1075
+  },
+  {
+    "date": "202333",
+    "services": 100,
+    "birthings": 79,
+    "nweaned": 1062
+  },
+  {
+    "date": "202334",
+    "services": 83,
+    "birthings": 75,
+    "nweaned": 1068
+  },
+  {
+    "date": "202335",
+    "services": 104,
+    "birthings": 84,
+    "nweaned": 1060
+  },
+  {
+    "date": "202336",
+    "services": 97,
+    "birthings": 86,
+    "nweaned": 1111
+  },
+  {
+    "date": "202337",
+    "services": 91,
+    "birthings": 88,
+    "nweaned": 1033
+  },
+  {
+    "date": "202338",
+    "services": 99,
+    "birthings": 83,
+    "nweaned": 1154
+  },
+  {
+    "date": "202339",
+    "services": 91,
+    "birthings": 89,
+    "nweaned": 1181
+  },
+  {
+    "date": "202340",
+    "services": 87,
+    "birthings": 86,
+    "nweaned": 1316
+  },
+  {
+    "date": "202341",
+    "services": 88,
+    "birthings": 85,
+    "nweaned": 1138
+  },
+  {
+    "date": "202342",
+    "services": 85,
+    "birthings": 87,
+    "nweaned": 1042
+  },
+  {
+    "date": "202343",
+    "services": 72,
+    "birthings": 90,
+    "nweaned": 1085
+  },
+  {
+    "date": "202344",
+    "services": 85,
+    "birthings": 77,
+    "nweaned": 1177
+  },
+  {
+    "date": "202345",
+    "services": 109,
+    "birthings": 71,
+    "nweaned": 1176
+  },
+  {
+    "date": "202346",
+    "services": 101,
+    "birthings": 90,
+    "nweaned": 1268
+  },
+  {
+    "date": "202347",
+    "services": 82,
+    "birthings": 77,
+    "nweaned": 1090
+  },
+  {
+    "date": "202348",
+    "services": 96,
+    "birthings": 84,
+    "nweaned": 801
+  },
+  {
+    "date": "202349",
+    "services": 77,
+    "birthings": 86,
+    "nweaned": 1224
+  },
+  {
+    "date": "202350",
+    "services": 95,
+    "birthings": 83,
+    "nweaned": 1158
+  },
+  {
+    "date": "202351",
+    "services": 117,
+    "birthings": 85,
+    "nweaned": 1119
+  },
+  {
+    "date": "202352",
+    "services": 82,
+    "birthings": 89,
+    "nweaned": 1080
+  },
+  {
+    "date": "202401",
+    "services": 96,
+    "birthings": 91,
+    "nweaned": 1271
+  },
+  {
+    "date": "202402",
+    "services": 79,
+    "birthings": 88,
+    "nweaned": 1194
+  },
+  {
+    "date": "202403",
+    "services": 90,
+    "birthings": 83,
+    "nweaned": 1091
+  },
+  {
+    "date": "202404",
+    "services": 103,
+    "birthings": 77,
+    "nweaned": 1236
+  },
+  {
+    "date": "202405",
+    "services": 113,
+    "birthings": 81,
+    "nweaned": 1305
+  },
+  {
+    "date": "202406",
+    "services": 111,
+    "birthings": 75,
+    "nweaned": 1143
+  },
+  {
+    "date": "202407",
+    "services": 103,
+    "birthings": 66,
+    "nweaned": 1267
+  },
+  {
+    "date": "202408",
+    "services": 101,
+    "birthings": 67,
+    "nweaned": 783
+  },
+  {
+    "date": "202409",
+    "services": 94,
+    "birthings": 94,
+    "nweaned": 855
+  },
+  {
+    "date": "202410",
+    "services": 69,
+    "birthings": 82,
+    "nweaned": 938
+  },
+  {
+    "date": "202411",
+    "services": 97,
+    "birthings": 86,
+    "nweaned": 920
+  },
+  {
+    "date": "202412",
+    "services": 93,
+    "birthings": 75,
+    "nweaned": 1188
+  },
+  {
+    "date": "202413",
+    "services": 102,
+    "birthings": 65,
+    "nweaned": 1218
+  },
+  {
+    "date": "202414",
+    "services": 97,
+    "birthings": 85,
+    "nweaned": 1252
+  },
+  {
+    "date": "202415",
+    "services": 106,
+    "birthings": 93,
+    "nweaned": 1053
+  },
+  {
+    "date": "202416",
+    "services": 81,
+    "birthings": 82,
+    "nweaned": 823
+  },
+  {
+    "date": "202417",
+    "services": 67,
+    "birthings": 88,
+    "nweaned": 816
+  },
+  {
+    "date": "202418",
+    "services": 92,
+    "birthings": 79,
+    "nweaned": 1240
+  },
+  {
+    "date": "202419",
+    "services": 120,
+    "birthings": 68,
+    "nweaned": 1316
+  },
+  {
+    "date": "202420",
+    "services": 99,
+    "birthings": 90,
+    "nweaned": 1102
+  },
+  {
+    "date": "202421",
+    "services": 95,
+    "birthings": 90,
+    "nweaned": 1211
+  },
+  {
+    "date": "202422",
+    "services": 91,
+    "birthings": 100,
+    "nweaned": 1071
+  },
+  {
+    "date": "202423",
+    "services": 108,
+    "birthings": 93,
+    "nweaned": 1091
+  },
+  {
+    "date": "202424",
+    "services": 89,
+    "birthings": 98,
+    "nweaned": 1236
+  },
+  {
+    "date": "202425",
+    "services": 89,
+    "birthings": 77,
+    "nweaned": 1249
+  },
+  {
+    "date": "202426",
+    "services": 98,
+    "birthings": 69,
+    "nweaned": 1140
+  },
+  {
+    "date": "202427",
+    "services": 94,
+    "birthings": 79,
+    "nweaned": 1229
+  },
+  {
+    "date": "202428",
+    "services": 90,
+    "birthings": 75,
+    "nweaned": 1133
+  },
+  {
+    "date": "202429",
+    "services": 93,
+    "birthings": 99,
+    "nweaned": 1204
+  },
+  {
+    "date": "202430",
+    "services": 107,
+    "birthings": 86,
+    "nweaned": 1047
+  },
+  {
+    "date": "202431",
+    "services": 112,
+    "birthings": 87,
+    "nweaned": 844
+  },
+  {
+    "date": "202432",
+    "services": 90,
+    "birthings": 79,
+    "nweaned": 1218
+  },
+  {
+    "date": "202433",
+    "services": 92,
+    "birthings": 56,
+    "nweaned": 1195
+  },
+  {
+    "date": "202434",
+    "services": 101,
+    "birthings": 72,
+    "nweaned": 1121
+  },
+  {
+    "date": "202435",
+    "services": 91,
+    "birthings": 106,
+    "nweaned": 784
+  },
+  {
+    "date": "202436",
+    "services": 74,
+    "birthings": 94,
+    "nweaned": 713
+  },
+  {
+    "date": "202437",
+    "services": 81,
+    "birthings": 77,
+    "nweaned": 894
+  },
+  {
+    "date": "202438",
+    "services": 86,
+    "birthings": 87,
+    "nweaned": 1188
+  },
+  {
+    "date": "202439",
+    "services": 86,
+    "birthings": 86,
+    "nweaned": 1170
+  },
+  {
+    "date": "202440",
+    "services": 109,
+    "birthings": 90,
+    "nweaned": 1285
+  },
+  {
+    "date": "202441",
+    "services": 94,
+    "birthings": 72,
+    "nweaned": 1197
+  },
+  {
+    "date": "202442",
+    "services": 99,
+    "birthings": 83,
+    "nweaned": 819
+  },
+  {
+    "date": "202443",
+    "services": 81,
+    "birthings": 83,
+    "nweaned": 1257
+  },
+  {
+    "date": "202444",
+    "services": 93,
+    "birthings": 74,
+    "nweaned": 1213
+  },
+  {
+    "date": "202445",
+    "services": 96,
+    "birthings": 93,
+    "nweaned": 1171
+  },
+  {
+    "date": "202446",
+    "services": 98,
+    "birthings": 77,
+    "nweaned": 1224
+  },
+  {
+    "date": "202447",
+    "services": 112,
+    "birthings": 96,
+    "nweaned": 956
+  },
+  {
+    "date": "202448",
+    "services": 68,
+    "birthings": 91,
+    "nweaned": 1231
+  },
+  {
+    "date": "202449",
+    "services": 99,
+    "birthings": 94,
+    "nweaned": 1251
+  },
+  {
+    "date": "202450",
+    "services": 97,
+    "birthings": 75,
+    "nweaned": 1242
+  },
+  {
+    "date": "202451",
+    "services": 111,
+    "birthings": 81,
+    "nweaned": 995
+  },
+  {
+    "date": "202452",
+    "services": 68,
+    "birthings": 69,
+    "nweaned": 1167
+  },
+  {
+    "date": "202501",
+    "services": 88,
+    "birthings": 68,
+    "nweaned": 1172
+  },
+  {
+    "date": "202502",
+    "services": 104,
+    "birthings": 79,
+    "nweaned": 814
+  },
+  {
+    "date": "202503",
+    "services": 78,
+    "birthings": 75,
+    "nweaned": 1085
+  },
+  {
+    "date": "202504",
+    "services": 92,
+    "birthings": 98,
+    "nweaned": 817
+  },
+  {
+    "date": "202505",
+    "services": 74,
+    "birthings": 83,
+    "nweaned": 856
+  },
+  {
+    "date": "202506",
+    "services": 82,
+    "birthings": 86,
+    "nweaned": 1137
+  },
+  {
+    "date": "202507",
+    "services": 86,
+    "birthings": 77,
+    "nweaned": 1045
+  },
+  {
+    "date": "202508",
+    "services": 94,
+    "birthings": 83,
+    "nweaned": 1073
+  },
+  {
+    "date": "202509",
+    "services": 92,
+    "birthings": 75,
+    "nweaned": 1222
+  },
+  {
+    "date": "202510",
+    "services": 95,
+    "birthings": 96,
+    "nweaned": 979
+  },
+  {
+    "date": "202511",
+    "services": 104,
+    "birthings": 97,
+    "nweaned": 1191
+  },
+  {
+    "date": "202512",
+    "services": 99,
+    "birthings": 79,
+    "nweaned": 833
+  },
+  {
+    "date": "202513",
+    "services": 79,
+    "birthings": 79,
+    "nweaned": 1219
+  },
+  {
+    "date": "202514",
+    "services": 115,
+    "birthings": 92,
+    "nweaned": 1236
+  },
+  {
+    "date": "202515",
+    "services": 113,
+    "birthings": 82,
+    "nweaned": 1190
+  },
+  {
+    "date": "202516",
+    "services": 114,
+    "birthings": 75,
+    "nweaned": 1085
+  },
+  {
+    "date": "202517",
+    "services": 99,
+    "birthings": 85,
+    "nweaned": 1051
+  },
+  {
+    "date": "202518",
+    "services": 95,
+    "birthings": 73,
+    "nweaned": 1265
+  },
+  {
+    "date": "202519",
+    "services": 98,
+    "birthings": 67,
+    "nweaned": 796
+  },
+  {
+    "date": "202520",
+    "services": 83,
+    "birthings": 85,
+    "nweaned": 1181
+  },
+  {
+    "date": "202521",
+    "services": 111,
+    "birthings": 59,
+    "nweaned": 860
+  },
+  {
+    "date": "202522",
+    "services": 90,
+    "birthings": 77,
+    "nweaned": 841
+  },
+  {
+    "date": "202523",
+    "services": 78,
+    "birthings": 79,
+    "nweaned": 1173
+  },
+  {
+    "date": "202524",
+    "services": 110,
+    "birthings": 81,
+    "nweaned": 779
+  },
+  {
+    "date": "202525",
+    "services": 77,
+    "birthings": 75,
+    "nweaned": 860
+  },
+  {
+    "date": "202526",
+    "services": 88,
+    "birthings": 85,
+    "nweaned": 1130
+  },
+  {
+    "date": "202527",
+    "services": 98,
+    "birthings": 76,
+    "nweaned": 1061
+  },
+  {
+    "date": "202528",
+    "services": 93,
+    "birthings": 95,
+    "nweaned": 810
+  },
+  {
+    "date": "202529",
+    "services": 87,
+    "birthings": 61,
+    "nweaned": 1188
+  },
+  {
+    "date": "202530",
+    "services": 124,
+    "birthings": 91,
+    "nweaned": 853
+  },
+  {
+    "date": "202531",
+    "services": 67,
+    "birthings": 102,
+    "nweaned": 1212
+  },
+  {
+    "date": "202532",
+    "services": 118,
+    "birthings": 105,
+    "nweaned": 889
+  },
+  {
+    "date": "202533",
+    "services": 71,
+    "birthings": 93,
+    "nweaned": 1077
+  },
+  {
+    "date": "202534",
+    "services": 81,
+    "birthings": 81,
+    "nweaned": 1227
+  },
+  {
+    "date": "202535",
+    "services": 101,
+    "birthings": 89,
+    "nweaned": 1232
+  },
+  {
+    "date": "202536",
+    "services": 100,
+    "birthings": 77,
+    "nweaned": 1282
+  },
+  {
+    "date": "202537",
+    "services": 101,
+    "birthings": 92,
+    "nweaned": 1140
+  },
+  {
+    "date": "202538",
+    "services": 93,
+    "birthings": 85,
+    "nweaned": 1275
+  },
+  {
+    "date": "202539",
+    "services": 103,
+    "birthings": 67,
+    "nweaned": 1067
+  },
+  {
+    "date": "202540",
+    "services": 93,
+    "birthings": 99,
+    "nweaned": 1210
+  },
+  {
+    "date": "202541",
+    "services": 99,
+    "birthings": 71,
+    "nweaned": 855
+  },
+  {
+    "date": "202542",
+    "services": 84,
+    "birthings": 65,
+    "nweaned": 839
+  },
+  {
+    "date": "202543",
+    "services": 75,
+    "birthings": 86,
+    "nweaned": 1210
+  },
+  {
+    "date": "202544",
+    "services": 100,
+    "birthings": 78,
+    "nweaned": 1169
+  },
+  {
+    "date": "202545",
+    "services": 100,
+    "birthings": 65,
+    "nweaned": 806
+  },
+  {
+    "date": "202546",
+    "services": 93,
+    "birthings": 102,
+    "nweaned": 1112
+  },
+  {
+    "date": "202547",
+    "services": 98,
+    "birthings": 72,
+    "nweaned": 816
+  },
+  {
+    "date": "202548",
+    "services": 67,
+    "birthings": 86,
+    "nweaned": 826
+  },
+  {
+    "date": "202549",
+    "services": 36,
+    "birthings": 19,
+    "nweaned": 406
+  }
+]
