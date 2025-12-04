@@ -1,1 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Sitio 1 – Dashboard Reproducción</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{
+      --bg:#f3f6f9;
+      --card:#ffffff;
+      --muted:#5a6772;
+      --accent:#1f6feb;
+      --success:#2b8f45;
+      --warn:#e67e22;
+      --danger:#c0392b;
+      --maxwidth:1100px;
+    }
+    body{
+      background:var(--bg);
+      color:#233043;
+      font-family:Inter, "Segoe UI", Arial, sans-serif;
+      margin:0;
+      padding:22px;
+      display:flex;
+      justify-content:center;
+    }
+    .wrap{
+      width:100%;
+      max-width:var(--maxwidth);
+    }
+    header{margin-bottom:12px}
+    h1{margin:0;font-size:22px}
+    .sub{color:var(--muted);margin-top:6px;margin-bottom:18px}
+
+    .kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+    .kpi{
+      background:var(--card);
+      padding:12px;
+      border-radius:10px;
+      box-shadow:0 1px 6px rgba(16,24,40,0.05);
+      min-width:160px;
+      flex:1 1 160px;
+    }
+    .kpi small{display:block;color:var(--muted);font-size:12px}
+    .kpi .value{font-size:20px;font-weight:700;margin-top:6px}
+
+    .panel{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 1px 6px rgba(16,24,40,0.04);margin-bottom:14px}
+    .panel h2{margin:0 0 8px 0;font-size:16px}
+    #estado{color:var(--muted);margin-bottom:8px}
+
+    canvas{width:100% !important;height:320px !important;border-radius:8px}
+
+    table{width:100%;border-collapse:collapse;background:var(--card);border-radius:8px;overflow:hidden}
+    th,td{padding:8px 10px;text-align:right;border-bottom:1px solid #eef2f6;font-size:13px}
+    th{background:#f0f5fb;color:#223}
+    td.fecha{text-align:left;white-space:nowrap}
+    tbody tr:last-child td{border-bottom:none}
+
+    .error{color:var(--danger);font-weight:700;margin-bottom:10px}
+    @media (max-width:740px){
+      canvas{height:260px !important}
+      .kpi { min-width:140px }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>👑 Sitio 1 – Dashboard Reproducción</h1>
+      <div class="sub">UFL: <strong>F14CCB3B7</strong> · Datos: <em>FactBreeding</em> (semanal) · Fuente: JSON procesado por GitHub Actions</div>
+    </header>
+
+    <div id="top">
+      <!-- KPI cards -->
+      <div class="kpi-row">
+        <div class="kpi">
+          <small>Total inseminaciones</small>
+          <div id="kpi_services" class="value">—</div>
+        </div>
+        <div class="kpi">
+          <small>Total partos</small>
+          <div id="kpi_birthings" class="value">—</div>
+        </div>
+        <div class="kpi">
+          <small>Total destetes</small>
+          <div id="kpi_nweaned" class="value">—</div>
+        </div>
+        <div class="kpi">
+          <small>Piglets / parto · Conv. proxy</small>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div id="kpi_ppp" class="value">—</div>
+            <div id="kpi_conv" class="value" style="font-size:15px;color:var(--muted)">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="estado">Cargando datos...</div>
+
+    <div class="panel">
+      <h2>Gráfico semanal — Inseminaciones · Partos · Destetes</h2>
+      <canvas id="chartRepro"></canvas>
+    </div>
+
+    <div class="panel">
+      <h2>Detalle por semana</h2>
+      <div id="resumen" class="sub"></div>
+      <div style="overflow:auto">
+        <table id="tabla">
+          <thead>
+            <tr>
+              <th>Semana / Fecha</th>
+              <th>Inseminaciones</th>
+              <th>Partos</th>
+              <th>Destetes</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="font-size:12px;color:var(--muted);margin-top:8px">
+      Nota: las semanas vienen en formato <code>YYYYWW</code> (ej. 202310). Los cálculos son aproximados (proxy).
+    </div>
+  </div>
+
+  <script>
+    // --- utilidades ---
+    function isoWeekToDateLabel(yyyyww) {
+      const s = String(yyyyww);
+      if (s.length < 6) return s;
+      const year = parseInt(s.slice(0,4),10);
+      const week = parseInt(s.slice(4),10);
+      if (!year || !week) return s;
+
+      // Start from Jan 4th method (ISO week)
+      const simple = new Date(Date.UTC(year,0,4));
+      const dayOfWeek = simple.getUTCDay() || 7; // 1..7 Mon..Sun
+      const isoWeek1Start = new Date(simple);
+      isoWeek1Start.setUTCDate(simple.getUTCDate() - dayOfWeek + 1); // Monday of week 1
+
+      const weekStart = new Date(isoWeek1Start);
+      weekStart.setUTCDate(isoWeek1Start.getUTCDate() + (week - 1) * 7);
+
+      // format localized short date (browser locale)
+      return weekStart.toLocaleDateString();
+    }
+
+    function movingAverage(arr,n=4){
+      const res = [];
+      for(let i=0;i<arr.length;i++){
+        const start = Math.max(0, i - n + 1);
+        const sub = arr.slice(start, i+1);
+        const sum = sub.reduce((a,b)=>a+b,0);
+        res.push(sum / sub.length);
+      }
+      return res;
+    }
+
+    // --- carga y render ---
+    async function cargarDatos() {
+      const estado = document.getElementById('estado');
+      try {
+        const resp = await fetch('./data/factbreeding_sitio1.json', {cache: "no-store"});
+        if (!resp.ok) throw new Error('No se pudo cargar el JSON ('+resp.status+')');
+
+        const datos = await resp.json();
+        if (!Array.isArray(datos) || datos.length === 0) {
+          estado.textContent = 'No hay datos en factbreeding_sitio1.json';
+          return;
+        }
+
+        // ordenar por date (lexicográfico con numeric true)
+        datos.sort((a,b)=> (''+a.date).localeCompare(''+b.date, undefined, {numeric:true}));
+
+        // preparar arrays
+        const labels = datos.map(d => isoWeekToDateLabel(d.date || ''));
+        const serv = datos.map(d => Number(d.services||0));
+        const birth = datos.map(d => Number(d.birthings||0));
+        const wean = datos.map(d => Number(d.nweaned||0));
+
+        // KPIs
+        const totalServ = serv.reduce((s,v)=>s+v,0);
+        const totalBirth = birth.reduce((s,v)=>s+v,0);
+        const totalWean = wean.reduce((s,v)=>s+v,0);
+
+        const pigletsPerBirth = totalBirth ? (totalWean / totalBirth) : 0;
+        const weanedPerService = totalServ ? (totalWean / totalServ) : 0;
+        const conceptionProxy = totalServ ? (totalBirth / totalServ) : 0;
+
+        document.getElementById('kpi_services').textContent = totalServ.toLocaleString();
+        document.getElementById('kpi_birthings').textContent = totalBirth.toLocaleString();
+        document.getElementById('kpi_nweaned').textContent = totalWean.toLocaleString();
+        document.getElementById('kpi_ppp').textContent = pigletsPerBirth ? pigletsPerBirth.toFixed(2) + ' piglets/parto' : '-';
+        document.getElementById('kpi_conv').textContent = conceptionProxy ? ( (conceptionProxy*100).toFixed(1) + '%' ) : '-';
+
+        // resumen
+        document.getElementById('resumen').textContent = `Total periodo – Inseminaciones: ${totalServ.toLocaleString()} · Partos: ${totalBirth.toLocaleString()} · Destetes: ${totalWean.toLocaleString()}`;
+        estado.textContent = `Registros cargados: ${datos.length} semanas`;
+
+        // medias móviles
+        const servMA = movingAverage(serv,4);
+        const birthMA = movingAverage(birth,4);
+        const weanMA = movingAverage(wean,4);
+
+        // gráfico (Chart.js)
+        const ctx = document.getElementById('chartRepro').getContext('2d');
+        if (window._reproChart) window._reproChart.destroy();
+        window._reproChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              { label: 'Inseminaciones', data: serv, borderWidth: 2, tension:0.2 },
+              { label: 'Inseminaciones MA(4)', data: servMA, borderDash: [6,4], borderWidth:1.5, tension:0.2 },
+              { label: 'Partos', data: birth, borderWidth: 2, tension:0.2 },
+              { label: 'Partos MA(4)', data: birthMA, borderDash: [6,4], borderWidth:1.5, tension:0.2 },
+              { label: 'Destetes', data: wean, borderWidth: 2, tension:0.2 },
+              { label: 'Destetes MA(4)', data: weanMA, borderDash: [6,4], borderWidth:1.5, tension:0.2 }
+            ]
+          },
+          options: {
+            responsive:true,
+            maintainAspectRatio:false,
+            interaction:{mode:'index',intersect:false},
+            plugins:{legend:{display:true}},
+            scales:{
+              x:{ ticks:{ maxTicksLimit: 14, autoSkip:true } },
+              y:{ beginAtZero:true }
+            }
+          }
+        });
+
+        // tabla
+        const tbody = document.querySelector('#tabla tbody');
+        tbody.innerHTML = '';
+        for (let i=0;i<datos.length;i++){
+          const row = datos[i];
+          const tr = document.createElement('tr');
+          const tdDate = document.createElement('td'); tdDate.className='fecha';
+          tdDate.textContent = labels[i] || row.date || '';
+          tr.appendChild(tdDate);
+
+          const tdS = document.createElement('td'); tdS.textContent = row.services || 0; tr.appendChild(tdS);
+          const tdB = document.createElement('td'); tdB.textContent = row.birthings || 0; tr.appendChild(tdB);
+          const tdW = document.createElement('td'); tdW.textContent = row.nweaned || 0; tr.appendChild(tdW);
+
+          tbody.appendChild(tr);
+        }
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById('estado').textContent = '';
+        const e = document.createElement('div');
+        e.className='error';
+        e.textContent = 'Error al cargar datos: ' + err.message;
+        document.querySelector('.wrap').prepend(e);
+      }
+    }
+
+    // arrancar
+    cargarDatos();
+  </script>
+</body>
+</html>
 
