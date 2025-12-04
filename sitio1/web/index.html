@@ -16,6 +16,7 @@
       --danger:#c0392b;
       --maxwidth:1100px;
     }
+    *{box-sizing:border-box}
     body{
       background:var(--bg);
       color:#233043;
@@ -32,6 +33,28 @@
     header{margin-bottom:12px}
     h1{margin:0;font-size:22px}
     .sub{color:var(--muted);margin-top:6px;margin-bottom:18px}
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .back-btn{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      background:#0b74e6;
+      color:white;
+      text-decoration:none;
+      border-radius:6px;
+      font-weight:600;
+      font-size:14px;
+    }
+    .back-btn small{opacity:0.9;font-weight:500}
 
     .kpi-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
     .kpi{
@@ -61,104 +84,66 @@
     @media (max-width:740px){
       canvas{height:260px !important}
       .kpi { min-width:140px }
+      .topbar { flex-direction:column; align-items:flex-start; gap:8px; }
     }
-    
-/* colores para indicadores de cumplimiento */
-.kpi.meets { border-left: 6px solid #2b8f45; }   /* verde */
-.kpi.below  { border-left: 6px solid #c0392b; }  /* rojo */
 
-/* opcional: cambiar color del número dentro de la tarjeta */
-.kpi.meets .value { color: #2b8f45; }
-.kpi.below .value  { color: #c0392b; }
+    /* colores para indicadores de cumplimiento */
+    .kpi.meets { border-left: 6px solid var(--success); }
+    .kpi.below  { border-left: 6px solid var(--danger); }
 
+    .kpi.meets .value { color: var(--success); }
+    .kpi.below .value  { color: var(--danger); }
 
-    
+    /* resumen pequeño */
+    .small-muted { color:var(--muted); font-size:13px; margin-top:8px }
   </style>
 </head>
-
-  <a href="../../index.html" 
-   style="
-        display:inline-block;
-        padding:10px 16px;
-        margin-bottom:20px;
-        background:#007bff;
-        color:white;
-        text-decoration:none;
-        border-radius:6px;
-        font-weight:bold;
-   ">
-    ⬅ Volver al Dashboard General
-</a>
-
-  
 <body>
   <div class="wrap">
+
+    <div class="topbar">
+      <a class="back-btn" href="../../index.html" title="Volver al índice general">⬅ Volver
+        <small>Dashboard general</small>
+      </a>
+
+      <div style="text-align:right">
+        <div style="font-weight:700">Sitio 1 — Reproducción</div>
+        <div class="small-muted">UFL: <strong>F14CCB3B7</strong> · Fuente: FactBreeding (JSON)</div>
+      </div>
+    </div>
+
     <header>
       <h1>👑 Sitio 1 – Dashboard Reproducción</h1>
-      <div class="sub">UFL: <strong>F14CCB3B7</strong> · Datos: <em>FactBreeding</em> (semanal) · Fuente: JSON procesado por GitHub Actions</div>
     </header>
 
-    <div id="top">
-    <!-- KPI cards (reemplazo) -->
-<div class="kpi-row">
-  <div id="card_services" class="kpi">
-    <small>Total inseminaciones (promedio últimas 10s)</small>
-    <div id="kpi_services" class="value">—</div>
-    <div style="margin-top:6px;font-size:12px;color:var(--muted)">
-      Meta semanal: <strong id="meta_services">91</strong>
-    </div>
-  </div>
+    <!-- KPI row (única) -->
+    <div class="kpi-row">
+      <div id="card_services" class="kpi">
+        <small>Inseminaciones (promedio últimas 10s)</small>
+        <div id="kpi_services" class="value">—</div>
+        <div class="small-muted">Meta semanal: <strong id="meta_services">91</strong></div>
+      </div>
 
-  <div id="card_birthings" class="kpi">
-    <small>Total partos (promedio últimas 10s)</small>
-    <div id="kpi_birthings" class="value">—</div>
-    <div style="margin-top:6px;font-size:12px;color:var(--muted)">
-      Meta semanal: <strong id="meta_birthings">83</strong>
-    </div>
-  </div>
+      <div id="card_birthings" class="kpi">
+        <small>Partos (promedio últimas 10s)</small>
+        <div id="kpi_birthings" class="value">—</div>
+        <div class="small-muted">Meta semanal: <strong id="meta_birthings">83</strong></div>
+      </div>
 
-  <div id="card_nweaned" class="kpi">
-    <small>Total destetes (promedio últimas 10s)</small>
-    <div id="kpi_nweaned" class="value">—</div>
-    <div style="margin-top:6px;font-size:12px;color:var(--muted)">
-      Meta semanal: <strong id="meta_nweaned">1132</strong>
-    </div>
-  </div>
+      <div id="card_nweaned" class="kpi">
+        <small>Destetes (promedio últimas 10s)</small>
+        <div id="kpi_nweaned" class="value">—</div>
+        <div class="small-muted">Meta semanal: <strong id="meta_nweaned">1132</strong></div>
+      </div>
 
-  <div class="kpi">
-    <small>Piglets / parto · Conv. proxy</small>
-    <div style="display:flex;gap:10px;align-items:center">
-      <div id="kpi_ppp" class="value">—</div>
-      <div id="kpi_conv" class="value" style="font-size:15px;color:var(--muted)">—</div>
+      <div class="kpi">
+        <small>Piglets / parto · Conv. proxy</small>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div id="kpi_ppp" class="value">—</div>
+          <div id="kpi_conv" class="value" style="font-size:15px;color:var(--muted)">—</div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
-  <div id="card_birthings" class="kpi">
-    <small>Total partos (promedio últimas 10s)</small>
-    <div id="kpi_birthings" class="value">—</div>
-    <div style="margin-top:6px;font-size:12px;color:var(--muted)">
-      Meta semanal: <strong id="meta_birthings">83</strong>
-    </div>
-  </div>
-
-  <div id="card_nweaned" class="kpi">
-    <small>Total destetes (promedio últimas 10s)</small>
-    <div id="kpi_nweaned" class="value">—</div>
-    <div style="margin-top:6px;font-size:12px;color:var(--muted)">
-      Meta semanal: <strong id="meta_nweaned">1132</strong>
-    </div>
-  </div>
-
-  <div class="kpi">
-    <small>Piglets / parto · Conv. proxy</small>
-    <div style="display:flex;gap:10px;align-items:center">
-      <div id="kpi_ppp" class="value">—</div>
-      <div id="kpi_conv" class="value" style="font-size:15px;color:var(--muted)">—</div>
-    </div>
-  </div>
-</div>
-
 
     <div id="estado">Cargando datos...</div>
 
@@ -185,30 +170,25 @@
       </div>
     </div>
 
-    <div style="font-size:12px;color:var(--muted);margin-top:8px">
-      Nota: las semanas vienen en formato <code>YYYYWW</code> (ej. 202310). Los cálculos son aproximados (proxy).
+    <div class="small-muted" style="margin-top:6px">
+      Nota: las semanas vienen en formato <code>YYYYWW</code> (ej. 202310). Los KPIs usan promedio de las últimas 10 semanas.
     </div>
   </div>
 
   <script>
-    // --- utilidades ---
+    // utilidades
     function isoWeekToDateLabel(yyyyww) {
       const s = String(yyyyww);
       if (s.length < 6) return s;
       const year = parseInt(s.slice(0,4),10);
       const week = parseInt(s.slice(4),10);
       if (!year || !week) return s;
-
-      // Start from Jan 4th method (ISO week)
       const simple = new Date(Date.UTC(year,0,4));
-      const dayOfWeek = simple.getUTCDay() || 7; // 1..7 Mon..Sun
+      const dayOfWeek = simple.getUTCDay() || 7;
       const isoWeek1Start = new Date(simple);
-      isoWeek1Start.setUTCDate(simple.getUTCDate() - dayOfWeek + 1); // Monday of week 1
-
+      isoWeek1Start.setUTCDate(simple.getUTCDate() - dayOfWeek + 1);
       const weekStart = new Date(isoWeek1Start);
       weekStart.setUTCDate(isoWeek1Start.getUTCDate() + (week - 1) * 7);
-
-      // format localized short date (browser locale)
       return weekStart.toLocaleDateString();
     }
 
@@ -223,53 +203,48 @@
       return res;
     }
 
-    // --- carga y render ---
+    function avgLastN(arr, n=10) {
+      if (!Array.isArray(arr) || arr.length === 0) return 0;
+      const sliceArr = arr.slice(-n);
+      const sum = sliceArr.reduce((s,v)=>s + (Number(v)||0), 0);
+      return sliceArr.length ? (sum / sliceArr.length) : 0;
+    }
+
     async function cargarDatos() {
       const estado = document.getElementById('estado');
       try {
         const resp = await fetch('../data/factbreeding_sitio1.json', {cache: "no-store"});
         if (!resp.ok) throw new Error('No se pudo cargar el JSON ('+resp.status+')');
-
         const datos = await resp.json();
+
         if (!Array.isArray(datos) || datos.length === 0) {
           estado.textContent = 'No hay datos en factbreeding_sitio1.json';
           return;
         }
 
-        // ordenar por date (lexicográfico con numeric true)
+        // ordenar por date
         datos.sort((a,b)=> (''+a.date).localeCompare(''+b.date, undefined, {numeric:true}));
 
-        // preparar arrays
+        // arrays
         const labels = datos.map(d => isoWeekToDateLabel(d.date || ''));
         const serv = datos.map(d => Number(d.services||0));
         const birth = datos.map(d => Number(d.birthings||0));
         const wean = datos.map(d => Number(d.nweaned||0));
 
-        // --- promedio últimas 10 semanas + metas + coloreo ---
-        function avgLastN(arr, n=10) {
-          if (!Array.isArray(arr) || arr.length === 0) return 0;
-          const sliceArr = arr.slice(-n);
-          const sum = sliceArr.reduce((s,v)=>s + (Number(v)||0), 0);
-          return sliceArr.length ? (sum / sliceArr.length) : 0;
-        }
-        
-        const TARGETS = {
-          services: 91,
-          birthings: 83,
-          nweaned: 1132
-        };
-        
+        // promedios ultimas 10 semanas (KPI)
         const avgServices10 = avgLastN(serv, 10);
         const avgBirth10 = avgLastN(birth, 10);
         const avgWean10 = avgLastN(wean, 10);
-        
+
+        // metas
+        const TARGETS = { services: 91, birthings: 83, nweaned: 1132 };
+
         const fmt = v => Math.round(v).toLocaleString();
-        
+
         document.getElementById('kpi_services').textContent = fmt(avgServices10);
         document.getElementById('kpi_birthings').textContent = fmt(avgBirth10);
         document.getElementById('kpi_nweaned').textContent = fmt(avgWean10);
-        
-        // aplicar color a tarjetas (add class meets o below)
+
         function applyColor(cardId, avgValue, target) {
           const card = document.getElementById(cardId);
           if (!card) return;
@@ -277,48 +252,32 @@
           if (avgValue >= target) card.classList.add('meets');
           else card.classList.add('below');
         }
-        
+
         applyColor('card_services', avgServices10, TARGETS.services);
         applyColor('card_birthings', avgBirth10, TARGETS.birthings);
         applyColor('card_nweaned', avgWean10, TARGETS.nweaned);
-        
-        // mantener piglets/parto y conv proxy
+
+        // totales y otros KPI (solo en resumen)
         const totalServ = serv.reduce((s,v)=>s+v,0);
         const totalBirth = birth.reduce((s,v)=>s+v,0);
         const totalWean = wean.reduce((s,v)=>s+v,0);
-        
+
         const pigletsPerBirth = totalBirth ? (totalWean / totalBirth) : 0;
         const conceptionProxy = totalServ ? (totalBirth / totalServ) : 0;
-        
+
         document.getElementById('kpi_ppp').textContent = pigletsPerBirth ? pigletsPerBirth.toFixed(2) + ' piglets/parto' : '-';
         document.getElementById('kpi_conv').textContent = conceptionProxy ? ((conceptionProxy*100).toFixed(1) + '%') : '-';
 
-        
-        // KPIs
-        const totalServ = serv.reduce((s,v)=>s+v,0);
-        const totalBirth = birth.reduce((s,v)=>s+v,0);
-        const totalWean = wean.reduce((s,v)=>s+v,0);
-
-        const pigletsPerBirth = totalBirth ? (totalWean / totalBirth) : 0;
-        const weanedPerService = totalServ ? (totalWean / totalServ) : 0;
-        const conceptionProxy = totalServ ? (totalBirth / totalServ) : 0;
-
-        document.getElementById('kpi_services').textContent = totalServ.toLocaleString();
-        document.getElementById('kpi_birthings').textContent = totalBirth.toLocaleString();
-        document.getElementById('kpi_nweaned').textContent = totalWean.toLocaleString();
-        document.getElementById('kpi_ppp').textContent = pigletsPerBirth ? pigletsPerBirth.toFixed(2) + ' piglets/parto' : '-';
-        document.getElementById('kpi_conv').textContent = conceptionProxy ? ( (conceptionProxy*100).toFixed(1) + '%' ) : '-';
-
-        // resumen
+        // resumen textual
         document.getElementById('resumen').textContent = `Total periodo – Inseminaciones: ${totalServ.toLocaleString()} · Partos: ${totalBirth.toLocaleString()} · Destetes: ${totalWean.toLocaleString()}`;
         estado.textContent = `Registros cargados: ${datos.length} semanas`;
 
-        // medias móviles
+        // medias moviles
         const servMA = movingAverage(serv,4);
         const birthMA = movingAverage(birth,4);
         const weanMA = movingAverage(wean,4);
 
-        // gráfico (Chart.js)
+        // gráfico
         const ctx = document.getElementById('chartRepro').getContext('2d');
         if (window._reproChart) window._reproChart.destroy();
         window._reproChart = new Chart(ctx, {
@@ -339,10 +298,7 @@
             maintainAspectRatio:false,
             interaction:{mode:'index',intersect:false},
             plugins:{legend:{display:true}},
-            scales:{
-              x:{ ticks:{ maxTicksLimit: 14, autoSkip:true } },
-              y:{ beginAtZero:true }
-            }
+            scales:{ x:{ ticks:{ maxTicksLimit: 14, autoSkip:true } }, y:{ beginAtZero:true } }
           }
         });
 
@@ -355,11 +311,9 @@
           const tdDate = document.createElement('td'); tdDate.className='fecha';
           tdDate.textContent = labels[i] || row.date || '';
           tr.appendChild(tdDate);
-
           const tdS = document.createElement('td'); tdS.textContent = row.services || 0; tr.appendChild(tdS);
           const tdB = document.createElement('td'); tdB.textContent = row.birthings || 0; tr.appendChild(tdB);
           const tdW = document.createElement('td'); tdW.textContent = row.nweaned || 0; tr.appendChild(tdW);
-
           tbody.appendChild(tr);
         }
 
@@ -378,4 +332,3 @@
   </script>
 </body>
 </html>
-
