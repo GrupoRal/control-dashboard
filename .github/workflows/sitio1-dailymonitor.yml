@@ -1,0 +1,40 @@
+name: Actualizar datos Sitio 1 - DailyMonitor
+
+on:
+  # Lo puedes correr a mano desde la pestaña Actions
+  workflow_dispatch:
+  # Y también automático, por ejemplo todos los días a las 06:00 UTC
+  schedule:
+    - cron: "0 6 * * *"
+
+jobs:
+  fetch-and-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Run fetch_dailymonitor.py
+        env:
+          AGRITEC_PAT: ${{ secrets.AGRITEC_PAT }}
+        run: |
+          python sitio1/scripts/fetch_dailymonitor.py
+
+      - name: Commit and push JSON
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add sitio1/data/dailymonitor_sitio1.json
+          git commit -m "Actualización DailyMonitor Sitio 1" || echo "Sin cambios para commitear"
+          git push
