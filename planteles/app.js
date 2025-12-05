@@ -1,5 +1,3 @@
-console.log('app.js cargado ✔️');
-
 
 /* ============================================
    Persistencia y datos iniciales
