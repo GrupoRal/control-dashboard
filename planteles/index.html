@@ -1,16 +1,138 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Planteles — Línea de Avance</title>
 
-<link rel="stylesheet" href="styles.css">
-
-  
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<script src="app.js"></script>
+    <!-- ============================
+         BARRA SUPERIOR
+    ============================= -->
+    <header class="topbar">
+        <h1>Dashboard Planteles — Línea de Avance</h1>
 
-  
+        <div class="tabs">
+            <button class="tab active" data-view="visual" onclick="switchView('visual')">Visualización</button>
+            <button class="tab" data-view="config" onclick="switchView('config')">Configuración</button>
+        </div>
+    </header>
+
+
+    <!-- ============================
+         VISUALIZACIÓN
+    ============================= -->
+    <section id="visualView">
+
+        <div id="hitosWrap" class="hitos-wrap">
+            <!-- Línea horizontal -->
+            <div id="connectorLine" class="connector-line"></div>
+        </div>
+
+        <!-- Detalle del hito -->
+        <div id="detalleArea" class="detalle-area">
+            <h2 id="detalleTitulo"></h2>
+            <div id="detalleInner"></div>
+        </div>
+
+    </section>
+
+
+    <!-- ============================
+         CONFIGURACIÓN
+    ============================= -->
+    <section id="configView" style="display:none;">
+
+        <h2>Editar Hito</h2>
+        <div class="config-box">
+            <label>Seleccionar hito:</label>
+            <select id="selectHitoEdit"></select>
+
+            <label>Descripción:</label>
+            <textarea id="editHitoDesc"></textarea>
+
+            <label>Avance (%):</label>
+            <input type="number" id="editHitoAvance" min="0" max="100">
+
+            <div class="btn-row">
+                <button id="btnSaveHito" class="btn green">Guardar</button>
+                <button id="btnDeleteHito" class="btn red">Eliminar</button>
+            </div>
+        </div>
+
+
+        <h2>Editar Sub-Hito</h2>
+        <div class="config-box">
+            <label>Seleccionar sub-hito:</label>
+            <select id="selectSubEdit"></select>
+
+            <label>Título del sub-hito:</label>
+            <input type="text" id="editSubTitle">
+
+            <label>Avance (%):</label>
+            <input type="number" id="editSubAvance" min="0" max="100">
+
+            <div class="btn-row">
+                <button id="btnSaveSub" class="btn green">Guardar</button>
+                <button id="btnDeleteSub" class="btn red">Eliminar</button>
+            </div>
+        </div>
+
+
+        <h2>Editar Documentos</h2>
+        <div class="config-box">
+            <label>Seleccionar documento:</label>
+            <select id="selectDocEdit"></select>
+
+            <label>Nombre:</label>
+            <input type="text" id="editDocName">
+
+            <label>Estado:</label>
+            <select id="editDocStatus">
+                <option value="pending">Pendiente</option>
+                <option value="approved">Aprobado</option>
+                <option value="rejected">Rechazado</option>
+            </select>
+
+            <div class="btn-row">
+                <button id="btnSaveDoc" class="btn green">Guardar</button>
+                <button id="btnDeleteDoc" class="btn red">Eliminar</button>
+            </div>
+        </div>
+
+
+        <h2>Agregar Hito</h2>
+        <div class="config-box">
+            <label>Nuevo título:</label>
+            <input type="text" id="newHitoTitle">
+
+            <label>Prioridad:</label>
+            <select id="newHitoPriority">
+                <option value="Alta">Alta</option>
+                <option value="Media">Media</option>
+                <option value="Baja">Baja</option>
+            </select>
+
+            <button id="btnAddHito" class="btn blue full">Agregar</button>
+        </div>
+
+
+        <h2>Opciones del sistema</h2>
+        <div class="config-box">
+            <button id="btnExport" class="btn blue">Exportar JSON</button>
+            <button id="btnResetSeed" class="btn red">Restaurar Datos Iniciales</button>
+        </div>
+
+    </section>
+
+
+    <!-- ============================
+         LÓGICA JAVASCRIPT
+    ============================= -->
+    <script src="app.js"></script>
 </body>
 </html>
-
