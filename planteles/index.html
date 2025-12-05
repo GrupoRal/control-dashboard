@@ -1,134 +1,305 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Regularización de Planteles</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Regularización de Planteles — Línea de Tiempo</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #f3f5f9;
-      margin: 0;
-      padding: 20px;
-      color: #333;
+    :root{
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --accent:#2b82d9;
+      --muted:#5b6470;
+      --glass: rgba(43,130,217,0.12);
+      --line:#dceafc;
+    }
+    body{
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin:0;
+      padding:20px;
+      background:var(--bg);
+      color:#212529;
     }
 
-    h1 {
-      margin-top: 0;
-      color: #233043;
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
+      margin-bottom:14px;
+    }
+    h1{margin:0;font-size:20px;color:#233043}
+    p.lead{margin:0;color:var(--muted);font-size:14px}
+
+    /* CONTENEDOR HORIZONTAL DE HITOS */
+    .hitos-wrap{
+      position: relative;       /* IMPORTANTE para posicionar la línea y los dots */
+      background:transparent;
+      padding:28px 6px 34px;    /* espacio inferior para la línea/dots */
+      overflow-x:auto;          /* scroll horizontal si hay muchos hitos */
+      white-space:nowrap;       /* evita que se rompan a nueva línea */
+      margin-bottom:18px;
     }
 
-    .hito {
-      background: white;
-      border-radius: 10px;
-      padding: 18px;
-      margin: 14px 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      border-left: 5px solid #2b82d9;
-      cursor: pointer;
+    /* Línea que conecta los hitos (barra horizontal) */
+    .connector-line {
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      height: 6px;             /* grosor de la línea */
+      background: linear-gradient(90deg, var(--line), rgba(0,0,0,0.02));
+      top: 60%;                /* valor inicial; será recalculado por JS */
+      transform: translateY(-50%);
+      border-radius: 6px;
+      z-index: 0;
+      pointer-events: none;
     }
 
-    .hito h2 {
-      margin: 0;
-      font-size: 18px;
+    .hito-card{
+      display:inline-block;      /* en fila */
+      vertical-align:top;
+      width:260px;
+      margin:0 12px;
+      background:var(--card);
+      border-radius:12px;
+      box-shadow:0 6px 20px rgba(13,23,36,0.06);
+      border:2px solid transparent;
+      padding:14px;
+      cursor:pointer;
+      transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+      position: relative;        /* para que el contenido quede por encima de la línea */
+      z-index: 2;
+    }
+    .hito-card:hover{ transform:translateY(-6px); box-shadow:0 14px 30px rgba(13,23,36,0.09); }
+    .hito-card.active{ border-color:var(--accent); box-shadow:0 18px 36px rgba(43,130,217,0.12); }
+
+    .hito-title{ font-weight:700; color:#1f2937; margin-bottom:6px; font-size:15px; }
+    .hito-desc{ color:var(--muted); font-size:13px; margin:0 0 8px 0; min-height:32px; }
+
+    .hito-meta{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:8px; }
+    .badge{ font-size:12px; padding:6px 8px; border-radius:999px; background:var(--glass); color:var(--accent); font-weight:600; }
+
+    /* DOTS que indican cada hito (se posicionan por JS) */
+    .connector-dot {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: var(--card);
+      border: 3px solid var(--accent);
+      box-shadow: 0 6px 14px rgba(43,130,217,0.12);
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      pointer-events: none;
     }
 
-    .subhitos {
-      display: none;
-      margin-top: 12px;
-      padding-left: 16px;
-      border-left: 2px dashed #aaa;
+    /* AREA DE DETALLE (subhitos + docs) que aparece debajo del hito clickeado */
+    .detalle-row{ width:100%; margin-top:8px; padding:0 6px; box-sizing:border-box; }
+    .detalle-inner{
+      background:#fff; border-radius:10px; padding:12px; box-shadow:0 6px 20px rgba(0,0,0,0.04);
+      display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap;
     }
 
-    .subhito {
-      background: #fafafa;
-      border-radius: 8px;
-      padding: 12px;
-      margin: 10px 0;
+    .subhito{
+      flex:1 1 260px;                 /* tamaño flexible, mínimo 260px */
+      background:#fafcff;
+      border-radius:8px;
+      padding:10px;
+      border:1px solid #eef6ff;
+    }
+    .subhito strong{ display:block; margin-bottom:6px; font-size:14px; }
+    .sub-prog{ font-size:13px; color:var(--accent); font-weight:700; margin-bottom:6px; }
+
+    .docs{ font-size:13px; color:var(--muted); padding-left:14px; margin:0;}
+    .docs li{ margin:6px 0; }
+
+    /* Mensaje cuando no hay hitos */
+    .empty{ text-align:center; color:var(--muted); padding:36px 12px; background:var(--card); border-radius:8px; }
+
+    /* Responsive: apilar en móvil */
+    @media (max-width:720px){
+      .hito-card{ width:85%; display:block; margin:10px auto; }
+      .detalle-inner{ flex-direction:column; }
+      .subhito{ width:100%; flex-basis:100% }
+      .connector-line{ display:none }  /* esconder línea en móviles para evitar solapamientos */
+      .connector-dot{ display:none }
     }
 
-    .avance {
-      font-size: 14px;
-      margin-top: 4px;
-      color: #2b82d9;
-      font-weight: bold;
-    }
-
-    .docs {
-      margin-top: 6px;
-      padding-left: 14px;
-    }
-
-    .docs li {
-      margin: 3px 0;
-    }
   </style>
 </head>
-
 <body>
 
-  <h1>📊 Regularización de Planteles</h1>
-  <p>Visualización de hitos, sub-hitos y documentos asociados al proceso de recepción municipal.</p>
+  <header>
+    <div>
+      <h1>📊 Regularización de Planteles</h1>
+      <p class="lead">Línea de tiempo horizontal — izquierda → derecha. Haz clic en un hito para ver sus sub-hitos y documentos.</p>
+    </div>
+    <div style="text-align:right;color:var(--muted);font-size:13px">Modo: Vista MVP · Local</div>
+  </header>
 
-  <!-- HITO 1 -->
-  <div class="hito" onclick="toggle(1)">
-    <h2>Hito 1: Documentación Base</h2>
-    <p>Actas, diagnósticos previos y recopilación inicial.</p>
+  <!-- CONTENEDOR HORIZONTAL DE HITOS -->
+  <div class="hitos-wrap" id="hitosWrap">
+    <!-- Línea horizontal (se posiciona por JS) -->
+    <div class="connector-line" id="connectorLine"></div>
 
-    <div class="subhitos" id="sub1">
-      <div class="subhito">
-        <strong>Sub-hito 1.1 – Revisión de antecedentes</strong>
-        <div class="avance">Avance: 60%</div>
-        <ul class="docs">
-          <li>✔ Acta de comité técnico</li>
-          <li>✔ Informe de diagnóstico inicial</li>
-          <li>❌ Plano actualizado</li>
-        </ul>
-      </div>
-
-      <div class="subhito">
-        <strong>Sub-hito 1.2 – Solicitud de documentos externos</strong>
-        <div class="avance">Avance: 25%</div>
-        <ul class="docs">
-          <li>❌ Certificado DOM</li>
-          <li>✔ Certificado SAG</li>
-        </ul>
+    <!-- tarjetas de ejemplo -->
+    <div class="hito-card" data-id="h1" onclick="openHito('h1', this)">
+      <div class="hito-title">Hito 1 — Documentación Base</div>
+      <div class="hito-desc">Actas, diagnósticos y recopilación inicial.</div>
+      <div class="hito-meta">
+        <div class="badge">Avance 42%</div>
+        <div class="muted" style="font-size:12px;color:var(--muted)">Prioridad: Alta</div>
       </div>
     </div>
-  </div>
 
-  <!-- HITO 2 -->
-  <div class="hito" onclick="toggle(2)">
-    <h2>Hito 2: Permisos Municipales</h2>
-    <p>Requerimientos previos para el ingreso formal.</p>
-
-    <div class="subhitos" id="sub2">
-      <div class="subhito">
-        <strong>Sub-hito 2.1 – Revisión de normas</strong>
-        <div class="avance">Avance: 10%</div>
-        <ul class="docs">
-          <li>❌ Certificación sanitaria</li>
-          <li>❌ Plan regulador comunal</li>
-        </ul>
-      </div>
-
-      <div class="subhito">
-        <strong>Sub-hito 2.2 – Presentación preliminar</strong>
-        <div class="avance">Avance: 0%</div>
-        <ul class="docs">
-          <li>❌ Carta de inicio</li>
-          <li>❌ Presentación técnica</li>
-        </ul>
+    <div class="hito-card" data-id="h2" onclick="openHito('h2', this)">
+      <div class="hito-title">Hito 2 — Permisos Municipales</div>
+      <div class="hito-desc">Requisitos y presentación al municipio.</div>
+      <div class="hito-meta">
+        <div class="badge">Avance 10%</div>
+        <div class="muted" style="font-size:12px;color:var(--muted)">Prioridad: Media</div>
       </div>
     </div>
+
+    <div class="hito-card" data-id="h3" onclick="openHito('h3', this)">
+      <div class="hito-title">Hito 3 — Regularización Ambiental</div>
+      <div class="hito-desc">Estudios, mitigaciones y certificados.</div>
+      <div class="hito-meta">
+        <div class="badge">Avance 0%</div>
+        <div class="muted" style="font-size:12px;color:var(--muted)">Prioridad: Baja</div>
+      </div>
+    </div>
+
+    <!-- aquí se añadirán más .hito-card si quieres -->
   </div>
 
-  <!-- Script -->
-  <script>
-    function toggle(num) {
-      const box = document.getElementById("sub" + num);
-      box.style.display = (box.style.display === "block") ? "none" : "block";
+  <!-- AREA DINÁMICA DONDE SE MUESTRAN LOS SUBHITOS DEL HITO SELECCIONADO -->
+  <div id="detalleArea" class="detalle-row" style="display:none">
+    <div class="detalle-inner" id="detalleInner"></div>
+  </div>
+
+<script>
+  /* ===== Datos de ejemplo (puedes reemplazarlos por JSON) ===== */
+  const sampleData = {
+    h1: {
+      title: "Hito 1 — Documentación Base",
+      subhitos: [
+        { id:"h1s1", title:"Revisión de antecedentes", avance:60, docs:["Acta de comité técnico (✔)","Informe diagnóstico (✔)","Plano actualizado (❌)"] },
+        { id:"h1s2", title:"Solicitud de documentos externos", avance:25, docs:["Certificado DOM (❌)","Certificado SAG (✔)"] }
+      ]
+    },
+    h2: {
+      title: "Hito 2 — Permisos Municipales",
+      subhitos: [
+        { id:"h2s1", title:"Revisión de normas", avance:10, docs:["Certificación sanitaria (❌)","Plan regulador (❌)"] },
+        { id:"h2s2", title:"Presentación preliminar", avance:0, docs:["Carta de inicio (❌)","Presentación técnica (❌)"] }
+      ]
+    },
+    h3: {
+      title: "Hito 3 — Regularización Ambiental",
+      subhitos: [
+        { id:"h3s1", title:"Estudios de impacto", avance:0, docs:["Estudio preliminar (❌)"] }
+      ]
     }
-  </script>
+  };
+
+  let currentOpen = null; // id del hito abierto
+
+  /* ===== función que abre/cierrra el detalle del hito ===== */
+  function openHito(id, el){
+    const detalleArea = document.getElementById('detalleArea');
+    const detalleInner = document.getElementById('detalleInner');
+    const allCards = document.querySelectorAll('.hito-card');
+
+    // Desactivar todas las tarjetas visualmente
+    allCards.forEach(c => c.classList.remove('active'));
+
+    // Si ya está abierto el mismo, lo cerramos
+    if(currentOpen === id){
+      detalleArea.style.display = 'none';
+      currentOpen = null;
+      return;
+    }
+
+    // Activamos la tarjeta clickeada
+    el.classList.add('active');
+    currentOpen = id;
+
+    // Limpiamos y renderizamos los subhitos del hito seleccionado
+    detalleInner.innerHTML = '';
+    const data = sampleData[id];
+    if(!data || !data.subhitos || data.subhitos.length === 0){
+      detalleInner.innerHTML = '<div class="subhito">Sin sub-hitos</div>';
+    } else {
+      data.subhitos.forEach(s => {
+        const box = document.createElement('div');
+        box.className = 'subhito';
+        const docs = s.docs.map(d => `<li>${d}</li>`).join('');
+        box.innerHTML = `<strong>${s.title}</strong>
+                         <div class="sub-prog">Avance: ${s.avance}%</div>
+                         <ul class="docs">${docs}</ul>`;
+        detalleInner.appendChild(box);
+      });
+    }
+
+    // Mostrar área detalle y desplazar la vista para que se vea el detalle bajo la tarjeta
+    detalleArea.style.display = 'block';
+
+    // Asegurar que la tarjeta clickeada esté visible en el viewport horizontalmente
+    // si el contenedor tiene scroll horizontal
+    el.scrollIntoView({behavior:'smooth', inline:'center'});
+  }
+
+  /* ===== Conectores: dibuja dots centrados bajo cada tarjeta y posiciona la línea ===== */
+  function createConnectors(){
+    const wrap = document.getElementById('hitosWrap');
+    const line = document.getElementById('connectorLine');
+
+    // Borrar dots previos
+    document.querySelectorAll('.connector-dot').forEach(d => d.remove());
+
+    const cards = Array.from(wrap.querySelectorAll('.hito-card'));
+    if(cards.length === 0) {
+      line.style.display = 'none';
+      return;
+    }
+
+    // calcular la posición vertical de la línea: punto medio de la primera tarjeta (relativo al contenedor)
+    const firstRect = cards[0].getBoundingClientRect();
+    const wrapRect = wrap.getBoundingClientRect();
+    // línea a la mitad de la tarjeta (en relación a wrap)
+    const lineTop = (firstRect.top + firstRect.height/2) - wrapRect.top + wrap.scrollTop;
+    line.style.top = `${lineTop}px`;
+    line.style.display = 'block';
+
+    // para cada tarjeta, crear un dot centrado respecto a la tarjeta
+    cards.forEach(card => {
+      const rect = card.getBoundingClientRect();
+      const centerX = (rect.left + rect.right)/2 - wrapRect.left + wrap.scrollLeft;
+
+      const dot = document.createElement('div');
+      dot.className = 'connector-dot';
+      dot.style.left = `${centerX}px`;
+      dot.style.top = `${lineTop}px`;
+      wrap.appendChild(dot);
+    });
+  }
+
+  // recalcula posiciones al cargar, al redimensionar y al scrollear el contenedor
+  window.addEventListener('load', () => {
+    createConnectors();
+  });
+  window.addEventListener('resize', () => {
+    createConnectors();
+  });
+  // si el usuario hace scroll horizontal sobre el contenedor, recalcular (mejora la UX)
+  document.getElementById('hitosWrap').addEventListener('scroll', () => {
+    // pequeño throttle con requestAnimationFrame para no recalcular mil veces
+    window.requestAnimationFrame(createConnectors);
+  });
+
+</script>
 
 </body>
 </html>
+
