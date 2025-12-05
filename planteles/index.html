@@ -1,1 +1,134 @@
-Agregar dashboard base de planteles
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Regularización de Planteles</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f3f5f9;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #233043;
+    }
+
+    .hito {
+      background: white;
+      border-radius: 10px;
+      padding: 18px;
+      margin: 14px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border-left: 5px solid #2b82d9;
+      cursor: pointer;
+    }
+
+    .hito h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .subhitos {
+      display: none;
+      margin-top: 12px;
+      padding-left: 16px;
+      border-left: 2px dashed #aaa;
+    }
+
+    .subhito {
+      background: #fafafa;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 10px 0;
+    }
+
+    .avance {
+      font-size: 14px;
+      margin-top: 4px;
+      color: #2b82d9;
+      font-weight: bold;
+    }
+
+    .docs {
+      margin-top: 6px;
+      padding-left: 14px;
+    }
+
+    .docs li {
+      margin: 3px 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>📊 Regularización de Planteles</h1>
+  <p>Visualización de hitos, sub-hitos y documentos asociados al proceso de recepción municipal.</p>
+
+  <!-- HITO 1 -->
+  <div class="hito" onclick="toggle(1)">
+    <h2>Hito 1: Documentación Base</h2>
+    <p>Actas, diagnósticos previos y recopilación inicial.</p>
+
+    <div class="subhitos" id="sub1">
+      <div class="subhito">
+        <strong>Sub-hito 1.1 – Revisión de antecedentes</strong>
+        <div class="avance">Avance: 60%</div>
+        <ul class="docs">
+          <li>✔ Acta de comité técnico</li>
+          <li>✔ Informe de diagnóstico inicial</li>
+          <li>❌ Plano actualizado</li>
+        </ul>
+      </div>
+
+      <div class="subhito">
+        <strong>Sub-hito 1.2 – Solicitud de documentos externos</strong>
+        <div class="avance">Avance: 25%</div>
+        <ul class="docs">
+          <li>❌ Certificado DOM</li>
+          <li>✔ Certificado SAG</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- HITO 2 -->
+  <div class="hito" onclick="toggle(2)">
+    <h2>Hito 2: Permisos Municipales</h2>
+    <p>Requerimientos previos para el ingreso formal.</p>
+
+    <div class="subhitos" id="sub2">
+      <div class="subhito">
+        <strong>Sub-hito 2.1 – Revisión de normas</strong>
+        <div class="avance">Avance: 10%</div>
+        <ul class="docs">
+          <li>❌ Certificación sanitaria</li>
+          <li>❌ Plan regulador comunal</li>
+        </ul>
+      </div>
+
+      <div class="subhito">
+        <strong>Sub-hito 2.2 – Presentación preliminar</strong>
+        <div class="avance">Avance: 0%</div>
+        <ul class="docs">
+          <li>❌ Carta de inicio</li>
+          <li>❌ Presentación técnica</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script>
+    function toggle(num) {
+      const box = document.getElementById("sub" + num);
+      box.style.display = (box.style.display === "block") ? "none" : "block";
+    }
+  </script>
+
+</body>
+</html>
