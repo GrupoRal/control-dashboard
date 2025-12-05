@@ -1,3 +1,7 @@
+/* PRUEBA: resalta fondo para confirmar que styles.css se cargó */
+body { outline: 4px solid rgba(43,130,217,0.20); }
+
+
 :root {
   --bg:#f6f8fb;
   --card:#ffffff;
