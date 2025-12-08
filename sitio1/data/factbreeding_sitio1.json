@@ -114,22 +114,10 @@
     "nweaned": 935
   },
   {
-    "date": "202329",
-    "services": 90,
-    "birthings": 83,
-    "nweaned": 963
-  },
-  {
     "date": "202330",
     "services": 95,
     "birthings": 84,
     "nweaned": 1033
-  },
-  {
-    "date": "202331",
-    "services": 89,
-    "birthings": 84,
-    "nweaned": 1123
   },
   {
     "date": "202332",
@@ -234,12 +222,6 @@
     "nweaned": 801
   },
   {
-    "date": "202349",
-    "services": 77,
-    "birthings": 86,
-    "nweaned": 1224
-  },
-  {
     "date": "202350",
     "services": 95,
     "birthings": 83,
@@ -292,12 +274,6 @@
     "services": 111,
     "birthings": 75,
     "nweaned": 1143
-  },
-  {
-    "date": "202407",
-    "services": 103,
-    "birthings": 66,
-    "nweaned": 1267
   },
   {
     "date": "202408",
@@ -414,12 +390,6 @@
     "nweaned": 1140
   },
   {
-    "date": "202427",
-    "services": 94,
-    "birthings": 79,
-    "nweaned": 1229
-  },
-  {
     "date": "202428",
     "services": 90,
     "birthings": 75,
@@ -436,12 +406,6 @@
     "services": 107,
     "birthings": 86,
     "nweaned": 1047
-  },
-  {
-    "date": "202431",
-    "services": 112,
-    "birthings": 87,
-    "nweaned": 844
   },
   {
     "date": "202432",
@@ -634,6 +598,42 @@
     "services": 104,
     "birthings": 97,
     "nweaned": 1191
+  },
+  {
+    "date": "202407",
+    "services": 103,
+    "birthings": 66,
+    "nweaned": 1267
+  },
+  {
+    "date": "202349",
+    "services": 77,
+    "birthings": 86,
+    "nweaned": 1224
+  },
+  {
+    "date": "202331",
+    "services": 89,
+    "birthings": 84,
+    "nweaned": 1123
+  },
+  {
+    "date": "202329",
+    "services": 90,
+    "birthings": 83,
+    "nweaned": 963
+  },
+  {
+    "date": "202431",
+    "services": 112,
+    "birthings": 87,
+    "nweaned": 844
+  },
+  {
+    "date": "202427",
+    "services": 94,
+    "birthings": 79,
+    "nweaned": 1229
   },
   {
     "date": "202512",
@@ -862,5 +862,11 @@
     "services": 59,
     "birthings": 44,
     "nweaned": 1118
+  },
+  {
+    "date": "202550",
+    "services": 0,
+    "birthings": 0,
+    "nweaned": 0
   }
 ]
