@@ -1,11 +1,5 @@
 [
   {
-    "date": "202310",
-    "services": 97,
-    "birthings": 91,
-    "nweaned": 845
-  },
-  {
     "date": "202311",
     "services": 80,
     "birthings": 76,
@@ -114,10 +108,22 @@
     "nweaned": 935
   },
   {
+    "date": "202329",
+    "services": 90,
+    "birthings": 83,
+    "nweaned": 963
+  },
+  {
     "date": "202330",
     "services": 95,
     "birthings": 84,
     "nweaned": 1033
+  },
+  {
+    "date": "202331",
+    "services": 89,
+    "birthings": 84,
+    "nweaned": 1123
   },
   {
     "date": "202332",
@@ -186,6 +192,12 @@
     "nweaned": 1042
   },
   {
+    "date": "202310",
+    "services": 97,
+    "birthings": 91,
+    "nweaned": 845
+  },
+  {
     "date": "202343",
     "services": 72,
     "birthings": 90,
@@ -220,6 +232,12 @@
     "services": 96,
     "birthings": 84,
     "nweaned": 801
+  },
+  {
+    "date": "202349",
+    "services": 77,
+    "birthings": 86,
+    "nweaned": 1224
   },
   {
     "date": "202350",
@@ -274,6 +292,12 @@
     "services": 111,
     "birthings": 75,
     "nweaned": 1143
+  },
+  {
+    "date": "202407",
+    "services": 103,
+    "birthings": 66,
+    "nweaned": 1267
   },
   {
     "date": "202408",
@@ -390,6 +414,12 @@
     "nweaned": 1140
   },
   {
+    "date": "202427",
+    "services": 94,
+    "birthings": 79,
+    "nweaned": 1229
+  },
+  {
     "date": "202428",
     "services": 90,
     "birthings": 75,
@@ -406,6 +436,12 @@
     "services": 107,
     "birthings": 86,
     "nweaned": 1047
+  },
+  {
+    "date": "202431",
+    "services": 112,
+    "birthings": 87,
+    "nweaned": 844
   },
   {
     "date": "202432",
@@ -540,12 +576,6 @@
     "nweaned": 1172
   },
   {
-    "date": "202502",
-    "services": 104,
-    "birthings": 79,
-    "nweaned": 814
-  },
-  {
     "date": "202503",
     "services": 78,
     "birthings": 75,
@@ -600,42 +630,6 @@
     "nweaned": 1191
   },
   {
-    "date": "202407",
-    "services": 103,
-    "birthings": 66,
-    "nweaned": 1267
-  },
-  {
-    "date": "202349",
-    "services": 77,
-    "birthings": 86,
-    "nweaned": 1224
-  },
-  {
-    "date": "202331",
-    "services": 89,
-    "birthings": 84,
-    "nweaned": 1123
-  },
-  {
-    "date": "202329",
-    "services": 90,
-    "birthings": 83,
-    "nweaned": 963
-  },
-  {
-    "date": "202431",
-    "services": 112,
-    "birthings": 87,
-    "nweaned": 844
-  },
-  {
-    "date": "202427",
-    "services": 94,
-    "birthings": 79,
-    "nweaned": 1229
-  },
-  {
     "date": "202512",
     "services": 99,
     "birthings": 79,
@@ -664,12 +658,6 @@
     "services": 114,
     "birthings": 75,
     "nweaned": 1085
-  },
-  {
-    "date": "202517",
-    "services": 99,
-    "birthings": 85,
-    "nweaned": 1051
   },
   {
     "date": "202518",
@@ -859,14 +847,26 @@
   },
   {
     "date": "202549",
-    "services": 59,
-    "birthings": 44,
-    "nweaned": 1118
+    "services": 69,
+    "birthings": 56,
+    "nweaned": 1177
+  },
+  {
+    "date": "202517",
+    "services": 99,
+    "birthings": 85,
+    "nweaned": 1051
+  },
+  {
+    "date": "202502",
+    "services": 104,
+    "birthings": 79,
+    "nweaned": 814
   },
   {
     "date": "202550",
-    "services": 0,
-    "birthings": 0,
-    "nweaned": 0
+    "services": 21,
+    "birthings": 4,
+    "nweaned": 469
   }
 ]
