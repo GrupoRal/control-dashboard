@@ -7,6 +7,20 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
+    <style>
+      /* Pequeños estilos inline para mejorar la vista de configuración visual */
+      .config-toolbar { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
+      #hitosConfigWrap { display:flex; gap:12px; align-items:flex-start; padding:8px; overflow:auto; border:1px dashed #ddd; min-height:120px; }
+      .hito-card.config { width:260px; cursor:grab; position:relative; padding:10px; border:1px solid #ccc; background:#fff; border-radius:6px; }
+      .card-meta { margin-top:8px; font-size:13px; color:#666; }
+      .card-actions { display:flex; gap:6px; margin-top:8px; }
+      .sub-list { margin-top:8px; padding-left:10px; }
+      .sub-item { display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:4px 0; }
+      .doc-list { margin-top:6px; padding-left:14px; font-size:13px; color:#444; }
+      .drag-handle { position:absolute; top:6px; right:6px; cursor:grab; font-size:12px; opacity:.6; }
+      .editing { outline:2px dashed #38f3; }
+      .small-input { width: 100%; box-sizing:border-box; }
+    </style>
 </head>
 <body>
 
@@ -43,111 +57,38 @@
 
 
     <!-- ============================
-         CONFIGURACIÓN
+         CONFIGURACIÓN (vista visual e interactiva)
     ============================= -->
     <section id="configView" style="display:none;">
 
-        <div class="config-grid">
-            <!-- PANEL HITOS -->
-            <div class="config-panel">
-                <h3>Hitos</h3>
-                <select id="selectHitoEdit" aria-label="Seleccionar hito"></select>
-
-                <label for="editHitoDesc">Descripción</label>
-                <textarea id="editHitoDesc"></textarea>
-
-                <label for="editHitoAvance">Avance (%):</label>
-                <input id="editHitoAvance" type="number" min="0" max="100" />
-
-                <label for="editHitoPriority">Prioridad</label>
-                <select id="editHitoPriority">
-                    <option value="Alta">Alta</option>
-                    <option value="Media">Media</option>
-                    <option value="Baja">Baja</option>
-                </select>
-
-                <div class="btn-row">
-                    <button id="btnNewHito" class="btn">Nuevo</button>
-                    <button id="btnSaveHito" class="btn green">Guardar</button>
-                    <button id="btnDeleteHito" class="btn red">Eliminar</button>
-                </div>
-
-                <div style="margin-top:12px;">
-                    <label>Crear Hito — título:</label>
-                    <input type="text" id="newHitoTitle" placeholder="Título nuevo hito">
-                    <label>Prioridad:</label>
-                    <select id="newHitoPriority">
-                        <option value="Alta">Alta</option>
-                        <option value="Media">Media</option>
-                        <option value="Baja">Baja</option>
-                    </select>
-                    <button id="btnAddHito" class="btn blue">Crear Hito</button>
-                </div>
-            </div>
-
-            <!-- PANEL SUB-HITOS -->
-            <div class="config-panel">
-                <h3>Sub‑hitos</h3>
-                <div id="subInstructions" class="muted">Selecciona un hito para ver sus sub‑hitos.</div>
-                <select id="selectSubEdit" aria-label="Seleccionar sub-hito"></select>
-
-                <label for="editSubTitle">Título</label>
-                <input id="editSubTitle" type="text" />
-
-                <label for="editSubAvance">Avance (%)</label>
-                <input id="editSubAvance" type="number" min="0" max="100" />
-
-                <div class="btn-row">
-                    <button id="btnNewSub" class="btn">Nuevo</button>
-                    <button id="btnSaveSub" class="btn green">Guardar</button>
-                    <button id="btnDeleteSub" class="btn red">Eliminar</button>
-                </div>
-
-                <!-- Formulario inline de nuevo sub-hito -->
-                <div class="inline-form" id="newSubForm" style="margin-top:10px;">
-                    <input id="newSubTitle" placeholder="Título nuevo sub-hito" />
-                    <input id="newSubAvance" type="number" min="0" max="100" value="0" />
-                    <button id="btnAddSubConfirm" class="btn blue">Crear sub-hito</button>
-                </div>
-            </div>
-
-            <!-- PANEL DOCUMENTOS -->
-            <div class="config-panel">
-                <h3>Documentos</h3>
-                <div id="docInstructions" class="muted">Selecciona un sub-hito para ver sus documentos.</div>
-                <select id="selectDocEdit" aria-label="Seleccionar documento"></select>
-
-                <label for="editDocName">Nombre</label>
-                <input id="editDocName" type="text" />
-
-                <label for="editDocStatus">Estado</label>
-                <select id="editDocStatus">
-                    <option value="pending">Pendiente</option>
-                    <option value="approved">Aprobado</option>
-                    <option value="rejected">Rechazado</option>
-                </select>
-
-                <div class="btn-row">
-                    <button id="btnNewDoc" class="btn">Nuevo</button>
-                    <button id="btnSaveDoc" class="btn green">Guardar</button>
-                    <button id="btnDeleteDoc" class="btn red">Eliminar</button>
-                </div>
-
-                <!-- Formulario inline nuevo doc -->
-                <div class="inline-form" id="newDocForm" style="margin-top:10px;">
-                    <input id="newDocName" placeholder="Nombre documento" />
-                    <select id="newDocStatus">
-                        <option value="pending">Pendiente</option>
-                        <option value="approved">Aprobado</option>
-                        <option value="rejected">Rechazado</option>
-                    </select>
-                    <button id="btnAddDocConfirm" class="btn blue">Agregar documento</button>
-                </div>
-            </div>
+      <div class="config-toolbar">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <label><strong>Modo configuración visual</strong></label>
         </div>
 
-        <!-- Area para mensajes (toasts) -->
-        <div id="configNotice" aria-live="polite" class="notice" style="display:none"></div>
+        <div style="margin-left:auto; display:flex; gap:8px;">
+          <input id="addHitoTitleInput" placeholder="Título nuevo hito" />
+          <select id="addHitoPriority">
+            <option value="Alta">Alta</option>
+            <option value="Media" selected>Media</option>
+            <option value="Baja">Baja</option>
+          </select>
+          <button id="btnAddHitoVisual" class="btn blue">Agregar Hito</button>
+          <button id="btnResetSeed" class="btn red">Restaurar datos iniciales</button>
+        </div>
+      </div>
+
+      <div id="hitosConfigWrap" aria-label="Hitos configurables">
+        <!-- Aquí se renderizan las tarjetas editables de hitos -->
+      </div>
+
+      <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+        <button id="btnSaveAll" class="btn green">Guardar cambios</button>
+        <div class="muted" style="font-size:13px;">Puedes arrastrar y soltar los hitos para reordenarlos.</div>
+      </div>
+
+      <!-- Mensajes -->
+      <div id="configNotice" aria-live="polite" class="notice" style="display:none; margin-top:8px;"></div>
     </section>
 
 
