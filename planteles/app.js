@@ -24,7 +24,7 @@ const seed = [
   }
 ];
 
-// Cargar
+// Cargar datos (prioriza localStorage)
 function loadData(){
   const raw = localStorage.getItem(STORAGE_KEY);
   if(raw) return JSON.parse(raw);
@@ -32,13 +32,13 @@ function loadData(){
   return JSON.parse(JSON.stringify(seed)); // Devuelve una copia para no modificar el seed
 }
 
-// Guardar
+// Guardar datos
 function saveData(data){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
 /* ============================================
-    Estado en memoria
+    Estado en memoria y Utilidades
 ============================================ */
 let data = loadData();
 let currentOpen = null;
@@ -55,6 +55,25 @@ function clampAvance(value){
     return num;
 }
 
+/* Mostrar mensajes breves en UI */
+function showNotice(msg, timeout=2500){
+  if(!configNotice) { console.log('NOTICE:', msg); return; }
+  configNotice.textContent = msg;
+  configNotice.style.display = 'block';
+  setTimeout(()=>{ configNotice.style.display='none'; configNotice.textContent=''; }, timeout);
+}
+
+/* Util: escapar HTML (pequeña protección al inyectar valores) */
+function escapeHtml(str){
+  if(!str) return '';
+  return String(str).replace(/[&<>"'`=\/]/g, function(s) {
+    return ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'
+    })[s];
+  });
+}
+
+
 /* ============================================
     Referencias DOM globales
 ============================================ */
@@ -66,6 +85,7 @@ const detalleTitulo = document.getElementById('detalleTitulo');
 
 const configWrap = document.getElementById('hitosConfigWrap');
 const configNotice = document.getElementById('configNotice');
+
 
 /* ============================================
     Cambio de pestañas Visualización / Config
@@ -175,17 +195,15 @@ function createConnectors(){
   }
 
   const wrapRect = wrap.getBoundingClientRect();
-  if(!cards[0]) return; // Evitar error si no hay cards
+  if(!cards[0]) return;
   const firstRect = cards[0].getBoundingClientRect();
 
-  // Calcular la posición vertical de la línea. Se asume que todas las tarjetas están a la misma altura.
   const lineTop = (firstRect.top + firstRect.height/2) - wrapRect.top + wrap.scrollTop;
   connectorLine.style.top = `${lineTop}px`;
   connectorLine.style.display='block';
 
   cards.forEach(card => {
     const rect = card.getBoundingClientRect();
-    // Calcular el centro horizontal de la tarjeta relativo al contenedor 'wrap'
     const centerX = (rect.left + rect.right)/2 - wrapRect.left + wrap.scrollLeft;
 
     const dot = document.createElement('div');
@@ -212,16 +230,6 @@ function recalcHitoAvance(h){
 /* ============================================
     CONFIGURACIÓN VISUAL: render y handlers
 ============================================ */
-
-/* Mostrar mensajes breves en UI */
-function showNotice(msg, timeout=2500){
-  if(!configNotice) { console.log('NOTICE:', msg); return; }
-  configNotice.textContent = msg;
-  configNotice.style.display = 'block';
-  setTimeout(()=>{ configNotice.style.display='none'; configNotice.textContent=''; }, timeout);
-}
-
-/* Re-render de la vista de configuración (tarjetas editables) */
 function renderHitosConfig(){
   configWrap.innerHTML = '';
 
@@ -289,13 +297,10 @@ function renderHitosConfig(){
     attachDragHandlers(card);
   });
 
-  // After rendering, append an "add placeholder" card at the end
+  // Tarjeta para agregar nuevo hito
   const addCard = document.createElement('div');
   addCard.className = 'hito-card config';
-  addCard.style.display = 'flex';
-  addCard.style.alignItems = 'center';
-  addCard.style.justifyContent = 'center';
-  addCard.style.cursor = 'default';
+  addCard.style.cssText = 'display: flex; align-items: center; justify-content: center; cursor: default;';
   addCard.innerHTML = `<button id="btnQuickAddHito" class="btn blue">+ Agregar nuevo hito</button>`;
   configWrap.appendChild(addCard);
   document.getElementById('btnQuickAddHito')?.addEventListener('click', ()=> {
@@ -303,10 +308,7 @@ function renderHitosConfig(){
   });
 }
 
-// ===========================================
 // Delegación de Eventos en Configuración
-// (Se deja esta parte intacta, maneja la lógica de edición inline)
-// ===========================================
 configWrap.addEventListener('click', (event) => {
     const target = event.target;
     const card = target.closest('.hito-card.config');
@@ -316,7 +318,7 @@ configWrap.addEventListener('click', (event) => {
     const h = data.find(x => x.id === hitoId);
     if (!h) return;
 
-    // ============= Hito Actions =============
+    // Hito Actions
     if (target.classList.contains('edit-hito')) {
         startEditHito(card, h);
     } else if (target.classList.contains('add-sub')) {
@@ -330,7 +332,7 @@ configWrap.addEventListener('click', (event) => {
         showNotice('Hito eliminado');
     }
 
-    // ============= Sub-hito & Document Actions =============
+    // Sub-hito & Document Actions
     const subId = target.dataset.subid;
     const subItemEl = target.closest('.sub-item');
     const s = h.subhitos ? h.subhitos.find(x => x.id === subId) : null;
@@ -364,9 +366,9 @@ configWrap.addEventListener('click', (event) => {
 });
 
 
-/* Inicia edición inline de un hito (resto de funciones de edición...) */
+/* Inicia edición inline de un hito */
 function startEditHito(card, h){
-  if(card.querySelector('.editing')) return; 
+  if(card.querySelector('.editing')) return;
   card.classList.add('editing');
   const content = card.querySelector('.hito-content');
   
@@ -622,33 +624,35 @@ function attachDragHandlers(card){
 }
 
 // ============================================
-// UTILIDADES DE ARCHIVO (Importar/Exportar) <-- NUEVA SECCIÓN
+// UTILIDADES DE ARCHIVO (Importar/Exportar)
 // ============================================
 
 function exportData() {
     // 1. Convertir los datos a texto JSON
     const dataString = JSON.stringify(data, null, 2);
     
-    // 2. Crear un Blob
+    // 2. Crear un Blob (archivo binario)
     const blob = new Blob([dataString], { type: 'application/json' });
     
-    // 3. Crear una URL para el Blob
+    // 3. Crear una URL temporal para el Blob
     const url = URL.createObjectURL(blob);
     
-    // 4. Crear un enlace de descarga (temporal)
+    // 4. Crear un enlace de descarga (elemento temporal <a>)
     const a = document.createElement('a');
     a.href = url;
     a.download = 'configuracion_linea_avance.json';
     
-    // 5. Simular el clic para iniciar la descarga
-    document.body.appendChild(a);
+    // 5. Simular el clic para iniciar la descarga.
+    // Usamos setTimeout(0) para asegurar que el elemento <a> se haya procesado 
+    // en el DOM, lo que es crucial para evitar bloqueos del navegador.
     a.click();
     
-    // 6. Limpiar (remover el enlace y revocar la URL)
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    showNotice('Configuración exportada exitosamente.');
+    // 6. Limpiar: Se recomienda un pequeño retraso para asegurar que la descarga 
+    // se inició antes de revocar la URL y mostrar el mensaje.
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+        showNotice('Configuración exportada exitosamente.');
+    }, 100); 
 }
 
 async function importData(jsonFile) {
@@ -658,9 +662,9 @@ async function importData(jsonFile) {
         const text = await jsonFile.text();
         const importedData = JSON.parse(text);
 
-        // Opcional: Validar que la estructura de los datos sea correcta
+        // Validar la estructura básica de los datos
         if (!Array.isArray(importedData) || importedData.length === 0 || !importedData[0].id) {
-            alert('Error: El archivo JSON no parece ser un formato de configuración válido.');
+            alert('Error: El archivo JSON no parece ser un formato de configuración válido. Estructura incorrecta.');
             return;
         }
 
@@ -706,7 +710,7 @@ document.getElementById('btnSaveAll')?.addEventListener('click', ()=>{
   showNotice('Cambios guardados');
 });
 
-/* Reset seed (el mismo botón ya existe; aquí lo reutilizamos) */
+/* Reset seed */
 document.getElementById('btnResetSeed')?.addEventListener('click',()=>{
   if(!confirm('¿Restaurar datos iniciales? Esto eliminará todos los cambios.')) return;
   data = JSON.parse(JSON.stringify(seed)); // Deep copy del seed
@@ -717,11 +721,7 @@ document.getElementById('btnResetSeed')?.addEventListener('click',()=>{
 });
 
 
-// ============================================
-// LISTENERS DE IMPORTACIÓN/EXPORTACIÓN <-- NUEVOS LISTENERS
-// ============================================
-
-// Listener para Exportar
+// LISTENERS DE IMPORTACIÓN/EXPORTACIÓN
 document.getElementById('btnExportData')?.addEventListener('click', exportData);
 
 // Listener para Importar (maneja el selector de archivo oculto)
@@ -734,18 +734,6 @@ document.getElementById('fileInput')?.addEventListener('change', (e) => {
     }
 });
 
-
-/* ============================================
-    Util: escapar HTML (pequeña protección al inyectar valores)
-============================================ */
-function escapeHtml(str){
-  if(!str) return '';
-  return String(str).replace(/[&<>"'`=\/]/g, function(s) {
-    return ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'
-    })[s];
-  });
-}
 
 /* ============================================
     Inicialización
