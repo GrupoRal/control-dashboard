@@ -44,6 +44,7 @@ function clampAvance(value){
 
 /* Mostrar mensajes breves en UI */
 function showNotice(msg, timeout=2500){
+  const configNotice = document.getElementById('configNotice'); // Aseguramos que se busque aquí
   if(!configNotice) { console.log('NOTICE:', msg); return; }
   configNotice.textContent = msg;
   configNotice.style.display = 'block';
@@ -57,6 +58,7 @@ function escapeHtml(str){
     return ({
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'
     })[s];
+  });
 }
 
 /* ============================================
@@ -65,29 +67,30 @@ function escapeHtml(str){
 
 /* Carga de Datos (Leyendo el archivo JSON estático) */
 async function loadData(){
-  try {
-    const response = await fetch(CONFIG_FILE_PATH);
-    if (!response.ok) {
-        console.warn(`Archivo de configuración no encontrado (${CONFIG_FILE_PATH}). Usando datos iniciales.`);
-        // Aseguramos que el seed se calcule antes de devolverlo
-        seed.forEach(h => recalcHitoAvance(h)); 
-        return JSON.parse(JSON.stringify(seed)); 
+    const defaultData = JSON.parse(JSON.stringify(seed));
+    defaultData.forEach(h => recalcHitoAvance(h)); // Calcular avance del seed
+
+    try {
+        const response = await fetch(CONFIG_FILE_PATH);
+        if (!response.ok) {
+            console.warn(`Archivo de configuración no encontrado (${CONFIG_FILE_PATH}). Usando datos iniciales.`);
+            return defaultData; 
+        }
+        
+        const data = await response.json();
+        if (!Array.isArray(data) || data.length === 0) {
+             console.warn("El archivo de configuración está vacío o es inválido. Usando datos iniciales.");
+             return defaultData;
+        }
+        
+        // Si la carga fue exitosa, calculamos y devolvemos los datos
+        data.forEach(h => recalcHitoAvance(h)); 
+        return data;
+    } catch (error) {
+        console.error("Error al cargar o parsear la configuración. Usando datos iniciales.", error);
+        // Si hay un error de sintaxis (parseo), usamos el seed
+        return defaultData;
     }
-    const data = await response.json();
-    if (!Array.isArray(data) || data.length === 0) {
-         console.warn("El archivo de configuración está vacío o es inválido. Usando datos iniciales.");
-         seed.forEach(h => recalcHitoAvance(h)); 
-         return JSON.parse(JSON.stringify(seed));
-    }
-    
-    // Aseguramos que el avance de los datos cargados esté bien calculado.
-    data.forEach(h => recalcHitoAvance(h)); 
-    return data;
-  } catch (error) {
-    console.error("Error al cargar o parsear la configuración. Usando datos iniciales.", error);
-    seed.forEach(h => recalcHitoAvance(h)); 
-    return JSON.parse(JSON.stringify(seed));
-  }
 }
 
 /* Marcar Cambios (Alerta de que el usuario debe descargar) */
@@ -167,7 +170,6 @@ const detalleInner = document.getElementById('detalleInner');
 const detalleTitulo = document.getElementById('detalleTitulo');
 
 const configWrap = document.getElementById('hitosConfigWrap');
-const configNotice = document.getElementById('configNotice');
 
 
 /* ============================================
@@ -201,6 +203,7 @@ function switchView(v){
     Render de hitos (Visualización clásica)
 ============================================ */
 function renderHitos(){
+  if (!wrap) return; // Validación importante
   wrap.querySelectorAll('.hito-card:not(.hito-card.config)').forEach(n=>n.remove());
 
   data.forEach(h => {
@@ -277,12 +280,12 @@ function createConnectors(){
   document.querySelectorAll('.connector-dot').forEach(d=>d.remove());
   const cards = Array.from(wrap.querySelectorAll('.hito-card:not(.hito-card.config)'));
   if(cards.length === 0){
-    connectorLine.style.display='none';
+    if(connectorLine) connectorLine.style.display='none';
     return;
   }
 
   const wrapRect = wrap.getBoundingClientRect();
-  if(!cards[0]) return; 
+  if(!cards[0] || !connectorLine) return; 
   const firstRect = cards[0].getBoundingClientRect();
 
   const lineTop = (firstRect.top + firstRect.height/2) - wrapRect.top + wrap.scrollTop;
@@ -305,6 +308,7 @@ function createConnectors(){
     CONFIGURACIÓN VISUAL: render y handlers
 ============================================ */
 function renderHitosConfig(){
+  if (!configWrap) return; // Validación importante
   configWrap.innerHTML = '';
 
   data.forEach((h, idx) => {
@@ -381,12 +385,12 @@ function renderHitosConfig(){
   addCard.innerHTML = `<button id="btnQuickAddHito" class="btn blue">+ Agregar nuevo hito</button>`;
   configWrap.appendChild(addCard);
   document.getElementById('btnQuickAddHito')?.addEventListener('click', ()=> {
-    document.getElementById('addHitoTitleInput').focus();
+    document.getElementById('addHitoTitleInput')?.focus();
   });
 }
 
 // Delegación de Eventos en Configuración
-configWrap.addEventListener('click', (event) => {
+configWrap?.addEventListener('click', (event) => {
     const target = event.target;
     const card = target.closest('.hito-card.config');
     if (!card) return;
@@ -471,13 +475,13 @@ function startEditHito(card, h){
   content.style.display = 'none';
   card.appendChild(tpl);
 
-  tpl.querySelector('.cancel-hito').addEventListener('click', ()=>{
+  tpl.querySelector('.cancel-hito')?.addEventListener('click', ()=>{
     tpl.remove();
     content.style.display = '';
     card.classList.remove('editing');
   });
 
-  tpl.querySelector('.save-hito').addEventListener('click', ()=>{
+  tpl.querySelector('.save-hito')?.addEventListener('click', ()=>{
     const newTitle = tpl.querySelector('.edit-title').value.trim();
     if(!newTitle) return alert('Título requerido');
     
@@ -504,6 +508,8 @@ function openNewSubForm(card, h){
     return;
   }
   const container = card.querySelector('.subs-container') || card.querySelector('.sub-list');
+  if(!container) return; // Validación de contenedor
+  
   const form = document.createElement('div');
   form.className = 'form-new-sub sub-item';
   form.innerHTML = `
@@ -517,10 +523,10 @@ function openNewSubForm(card, h){
     </div>
   `;
   container.prepend(form);
-  form.querySelector('.new-sub-title').focus();
+  form.querySelector('.new-sub-title')?.focus();
 
-  form.querySelector('.cancel-sub').addEventListener('click', ()=> form.remove());
-  form.querySelector('.create-sub').addEventListener('click', ()=>{
+  form.querySelector('.cancel-sub')?.addEventListener('click', ()=> form.remove());
+  form.querySelector('.create-sub')?.addEventListener('click', ()=>{
     const title = form.querySelector('.new-sub-title').value.trim();
 
     if(!title) return alert('Título requerido');
@@ -540,7 +546,6 @@ function openNewSubForm(card, h){
 /* Inicia edición inline de un sub-hito */
 function startEditSub(subItemEl, h, s, card){
   if(subItemEl.querySelector('.editing-sub')) return;
-  const backupHtml = subItemEl.innerHTML;
   subItemEl.classList.add('editing-sub');
 
   subItemEl.innerHTML = `
@@ -554,19 +559,18 @@ function startEditSub(subItemEl, h, s, card){
       </div>
     </div>
   `;
-  subItemEl.querySelector('.edit-sub-title').focus();
+  subItemEl.querySelector('.edit-sub-title')?.focus();
   
-  subItemEl.querySelector('.cancel-sub').addEventListener('click', ()=>{
+  subItemEl.querySelector('.cancel-sub')?.addEventListener('click', ()=>{
     subItemEl.classList.remove('editing-sub');
     renderHitosConfig(); 
   });
-  subItemEl.querySelector('.save-sub').addEventListener('click', ()=>{
+  subItemEl.querySelector('.save-sub')?.addEventListener('click', ()=>{
     const newTitle = subItemEl.querySelector('.edit-sub-title').value.trim();
     
     if(!newTitle) return alert('Título requerido');
     s.title = newTitle;
-    // Avance no se modifica, lo hará recalcHitoAvance
-
+    
     recalcHitoAvance(h);
     markChangesAsDirty(data);
     renderHitosConfig();
@@ -581,6 +585,9 @@ function openNewDocForm(subItemEl, h, s, card){
     subItemEl.querySelector('.form-new-doc input')?.focus();
     return;
   }
+  const docList = subItemEl.querySelector('.doc-list');
+  if(!docList) return; // Validación importante
+  
   const form = document.createElement('div');
   form.className = 'form-new-doc';
   form.innerHTML = `
@@ -597,11 +604,11 @@ function openNewDocForm(subItemEl, h, s, card){
       </div>
     </div>
   `;
-  subItemEl.querySelector('.doc-list')?.appendChild(form);
-  form.querySelector('.new-doc-name').focus();
+  docList.appendChild(form);
+  form.querySelector('.new-doc-name')?.focus();
 
-  form.querySelector('.cancel-doc').addEventListener('click', ()=> form.remove());
-  form.querySelector('.create-doc').addEventListener('click', ()=>{
+  form.querySelector('.cancel-doc')?.addEventListener('click', ()=> form.remove());
+  form.querySelector('.create-doc')?.addEventListener('click', ()=>{
     const name = form.querySelector('.new-doc-name').value.trim();
     const status = form.querySelector('.new-doc-status').value;
     if(!name) return alert('Nombre requerido');
@@ -640,13 +647,13 @@ function startEditDoc(subItemEl, h, s, di, card){
         </div>
     </div>
   `;
-  docNode.querySelector('.edit-doc-name').focus();
+  docNode.querySelector('.edit-doc-name')?.focus();
 
-  docNode.querySelector('.cancel-doc').addEventListener('click', ()=>{
+  docNode.querySelector('.cancel-doc')?.addEventListener('click', ()=>{
     docNode.innerHTML = backup;
     renderHitosConfig(); 
   });
-  docNode.querySelector('.save-doc').addEventListener('click', ()=>{
+  docNode.querySelector('.save-doc')?.addEventListener('click', ()=>{
     const newName = docNode.querySelector('.edit-doc-name').value.trim();
     const newStatus = docNode.querySelector('.edit-doc-status').value;
     if(!newName) return alert('Nombre requerido');
@@ -727,14 +734,21 @@ document.getElementById('btnSaveAll')?.addEventListener('click', ()=>{
 document.getElementById('btnResetSeed')?.addEventListener('click',()=>{
   if(!confirm('¿Restaurar datos iniciales? Esto eliminará todos los cambios.')) return;
   
-  data = JSON.parse(JSON.stringify(seed)); // Deep copy del seed
-  data.forEach(h => recalcHitoAvance(h)); // Aseguramos el cálculo del seed
+  // Genera una copia fresca del seed y calcula su avance.
+  const seedCopy = JSON.parse(JSON.stringify(seed));
+  seedCopy.forEach(h => recalcHitoAvance(h)); 
+  data = seedCopy;
   
   downloadConfig(data); // LLAMA DIRECTAMENTE A DESCARGAR
   
   renderHitosConfig();
   renderHitos();
   // La notificación la pone downloadConfig
+});
+
+// Listener para cambiar de vista con los tabs
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', (e) => switchView(e.target.dataset.view));
 });
 
 
@@ -751,4 +765,4 @@ window.addEventListener('load', async ()=>{
 });
 
 window.addEventListener('resize',()=> createConnectors());
-wrap.addEventListener('scroll',()=> window.requestAnimationFrame(createConnectors()));
+wrap?.addEventListener('scroll',()=> window.requestAnimationFrame(createConnectors()));
