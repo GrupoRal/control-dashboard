@@ -4,7 +4,7 @@
     "title": "Hito 1 - Permiso de Edificación",
     "desc": "Trámite y documentación para obtener permiso de edificación.",
     "priority": "Alta",
-    "avance": 81,
+    "avance": 73,
     "subhitos": [
       {
         "id": "h1s1",
@@ -40,13 +40,61 @@
       {
         "id": "h1s3",
         "title": "Documentos y Certificados Estatales",
-        "avance": 100,
+        "avance": 75,
         "docs": [
           "FACTIBILIDAD DE AGUA POTABLE [aprobado]",
           "Certificados de Alcantarillados [aprobado]",
           "CARGA DE COMBUSTIBLES [aprobado]",
-          "RCA (RESOLUCION CALIFICACION AMBIENTAL) [aprobado]"
+          "RCA (RESOLUCION CALIFICACION AMBIENTAL) [pendiente]"
         ]
+      }
+    ]
+  },
+  {
+    "id": "h_gw52u65",
+    "title": "Hito 2 - Ejecución de Obras",
+    "desc": "Ejecucion de obras involucradas en la carpeta de permiso de edificacion y Recepcion Municipal.",
+    "priority": "Alta",
+    "avance": 0,
+    "subhitos": [
+      {
+        "id": "s_oeh3pfv",
+        "title": "Acceso MOP",
+        "avance": 0,
+        "docs": []
+      },
+      {
+        "id": "s_7j3185t",
+        "title": "Proyecto Electrico (T1)",
+        "avance": 0,
+        "docs": []
+      },
+      {
+        "id": "s_0xk6zba",
+        "title": "Proyecto Alcantarillado",
+        "avance": 0,
+        "docs": []
+      }
+    ]
+  },
+  {
+    "id": "h_338pfoo",
+    "title": "Hito 3 - Recepcion Municipal",
+    "desc": "Certificado de la Dirección de Obras Municipales (DOM) que aprueba la construcción de una edificación, confirmando que se ajusta al permiso de edificación y normativas.",
+    "priority": "Alta",
+    "avance": 0,
+    "subhitos": [
+      {
+        "id": "s_yj5kxo8",
+        "title": "Revisión de Carpeta",
+        "avance": 0,
+        "docs": []
+      },
+      {
+        "id": "s_4udk1jf",
+        "title": "Visita Tecnica DOM",
+        "avance": 0,
+        "docs": []
       }
     ]
   }
