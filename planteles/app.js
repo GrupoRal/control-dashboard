@@ -1,5 +1,5 @@
 /* ============================================
-   Persistencia y datos iniciales
+    Persistencia y datos iniciales
 ============================================ */
 const STORAGE_KEY = 'planteles_v3';
 
@@ -29,7 +29,7 @@ function loadData(){
   const raw = localStorage.getItem(STORAGE_KEY);
   if(raw) return JSON.parse(raw);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(seed));
-  return JSON.parse(JSON.stringify(seed));
+  return JSON.parse(JSON.stringify(seed)); // Devuelve una copia para no modificar el seed
 }
 
 // Guardar
@@ -38,7 +38,7 @@ function saveData(data){
 }
 
 /* ============================================
-   Estado en memoria
+    Estado en memoria
 ============================================ */
 let data = loadData();
 let currentOpen = null;
@@ -47,8 +47,16 @@ let currentView = 'visual';
 /* UID simple */
 function uid(prefix='id'){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
 
+/* UTIL: forzar un número entre 0 y 100 */
+function clampAvance(value){
+    let num = parseInt(value, 10) || 0;
+    if (num < 0) return 0;
+    if (num > 100) return 100;
+    return num;
+}
+
 /* ============================================
-   Referencias DOM globales
+    Referencias DOM globales
 ============================================ */
 const wrap = document.getElementById('hitosWrap'); // visual view
 const connectorLine = document.getElementById('connectorLine');
@@ -60,7 +68,7 @@ const configWrap = document.getElementById('hitosConfigWrap');
 const configNotice = document.getElementById('configNotice');
 
 /* ============================================
-   Cambio de pestañas Visualización / Config
+    Cambio de pestañas Visualización / Config
 ============================================ */
 function switchView(v){
   currentView = v;
@@ -80,15 +88,18 @@ function switchView(v){
   if(v === 'config'){
     renderHitosConfig();
   } else {
+    // Es buena práctica ocultar el detalle al cambiar de vista, por si acaso
+    detalleArea.style.display = 'none';
+    currentOpen = null;
     createConnectors();
   }
 }
 
 /* ============================================
-   Render de hitos (Visualización clásica)
+    Render de hitos (Visualización clásica)
 ============================================ */
 function renderHitos(){
-  wrap.querySelectorAll('.hito-card').forEach(n=>n.remove());
+  wrap.querySelectorAll('.hito-card:not(.hito-card.config)').forEach(n=>n.remove());
 
   data.forEach(h => {
     const card = document.createElement('div');
@@ -97,11 +108,11 @@ function renderHitos(){
     card.onclick = ()=> openHito(h.id, card);
 
     card.innerHTML = `
-      <div class="hito-title">${h.title}</div>
-      <div class="hito-desc">${h.desc || ''}</div>
+      <div class="hito-title">${escapeHtml(h.title)}</div>
+      <div class="hito-desc">${escapeHtml(h.desc || '')}</div>
       <div class="hito-meta">
         <div class="badge">Avance ${h.avance || 0}%</div>
-        <div class="muted" style="font-size:12px">${h.priority || ''}</div>
+        <div class="muted" style="font-size:12px">${escapeHtml(h.priority || '')}</div>
       </div>
     `;
 
@@ -124,6 +135,7 @@ function openHito(id, el){
   el.classList.add('active');
   currentOpen = id;
   const h = data.find(x=>x.id===id);
+  if(!h) return;
 
   detalleTitulo.textContent = `Detalle — ${h.title}`;
   detalleInner.innerHTML = '';
@@ -135,10 +147,10 @@ function openHito(id, el){
       const box = document.createElement('div');
       box.className = 'subhito';
 
-      const docs = (s.docs||[]).map(d=>`<li>${d}</li>`).join('');
+      const docs = (s.docs||[]).map(d=>`<li>${escapeHtml(d)}</li>`).join('');
 
       box.innerHTML = `
-        <strong>${s.title}</strong>
+        <strong>${escapeHtml(s.title)}</strong>
         <div class="sub-prog">Avance: ${s.avance || 0}%</div>
         <ul class="docs">${docs}</ul>
       `;
@@ -151,26 +163,29 @@ function openHito(id, el){
 }
 
 /* ============================================
-   Conectores entre hitos (línea)
+    Conectores entre hitos (línea)
 ============================================ */
 function createConnectors(){
   if(!wrap) return;
   document.querySelectorAll('.connector-dot').forEach(d=>d.remove());
-  const cards = Array.from(wrap.querySelectorAll('.hito-card'));
+  const cards = Array.from(wrap.querySelectorAll('.hito-card:not(.hito-card.config)'));
   if(cards.length === 0){
     connectorLine.style.display='none';
     return;
   }
 
   const wrapRect = wrap.getBoundingClientRect();
+  if(!cards[0]) return; // Evitar error si no hay cards
   const firstRect = cards[0].getBoundingClientRect();
 
+  // Calcular la posición vertical de la línea. Se asume que todas las tarjetas están a la misma altura.
   const lineTop = (firstRect.top + firstRect.height/2) - wrapRect.top + wrap.scrollTop;
   connectorLine.style.top = `${lineTop}px`;
   connectorLine.style.display='block';
 
   cards.forEach(card => {
     const rect = card.getBoundingClientRect();
+    // Calcular el centro horizontal de la tarjeta relativo al contenedor 'wrap'
     const centerX = (rect.left + rect.right)/2 - wrapRect.left + wrap.scrollLeft;
 
     const dot = document.createElement('div');
@@ -182,17 +197,20 @@ function createConnectors(){
 }
 
 /* ============================================
-   UTIL: recalcular avance del hito (promedio simple)
+    UTIL: recalcular avance del hito (promedio simple)
 ============================================ */
 function recalcHitoAvance(h){
-  if(!h || !h.subhitos || h.subhitos.length===0) return;
-  const sum = h.subhitos.reduce((acc,s)=> acc + (parseInt(s.avance||0,10)||0), 0);
+  if(!h || !h.subhitos || h.subhitos.length===0){
+    h.avance = 0;
+    return;
+  }
+  const sum = h.subhitos.reduce((acc,s)=> acc + (clampAvance(s.avance)), 0);
   const avg = Math.round(sum / h.subhitos.length);
-  h.avance = avg;
+  h.avance = clampAvance(avg);
 }
 
 /* ============================================
-   CONFIGURACIÓN VISUAL: render y handlers
+    CONFIGURACIÓN VISUAL: render y handlers
 ============================================ */
 
 /* Mostrar mensajes breves en UI */
@@ -213,12 +231,44 @@ function renderHitosConfig(){
     card.dataset.id = h.id;
     card.draggable = true;
 
+    // Generar la lista de documentos
+    let subhitosHtml = '';
+    if(h.subhitos && h.subhitos.length){
+      h.subhitos.forEach(s=>{
+        const docs = (s.docs||[]).map((d, i)=>`
+            <div data-doc="${i}">
+                ${escapeHtml(d)}
+                <button class="btn edit-doc tiny" data-doc="${i}" data-subid="${s.id}">Editar</button>
+                <button class="btn del-doc tiny red" data-doc="${i}" data-subid="${s.id}">Eliminar</button>
+            </div>
+        `).join('');
+
+        subhitosHtml += `
+            <div class="sub-item" data-sid="${s.id}">
+                <div>
+                    <span class="sub-title">${escapeHtml(s.title)}</span>
+                    <div style="font-size:12px; color:#666;">Av: ${s.avance || 0}%</div>
+                    <div class="doc-list">${docs}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                    <button class="btn edit-sub tiny" data-subid="${s.id}">Editar</button>
+                    <button class="btn add-doc tiny" data-subid="${s.id}">+Doc</button>
+                    <button class="btn delete-sub tiny red" data-subid="${s.id}">Eliminar</button>
+                </div>
+            </div>
+        `;
+      });
+    } else {
+      subhitosHtml = `<div class="muted">Sin sub‑hitos</div>`;
+    }
+
+
     card.innerHTML = `
       <div class="drag-handle" title="Arrastrar para reordenar">☰</div>
       <div class="hito-content">
         <div class="hito-title-el">${escapeHtml(h.title)}</div>
         <div class="hito-desc-el muted">${escapeHtml(h.desc||'')}</div>
-        <div class="card-meta">Avance: ${h.avance || 0}% • Prioridad: ${h.priority || ''}</div>
+        <div class="card-meta">Avance: ${h.avance || 0}% • Prioridad: ${escapeHtml(h.priority || '')}</div>
 
         <div class="card-actions">
           <button class="btn edit-hito small">Editar</button>
@@ -228,49 +278,24 @@ function renderHitosConfig(){
 
         <div class="sub-list">
           <strong>Sub‑hitos</strong>
-          <div class="subs-container"></div>
+          <div class="subs-container">${subhitosHtml}</div>
         </div>
       </div>
     `;
 
-    // Adjuntar sub-hitos
-    const subsContainer = card.querySelector('.subs-container');
-    if(h.subhitos && h.subhitos.length){
-      h.subhitos.forEach(s=>{
-        const si = document.createElement('div');
-        si.className = 'sub-item';
-        si.dataset.sid = s.id;
-        si.innerHTML = `
-          <div>
-            <span class="sub-title">${escapeHtml(s.title)}</span>
-            <div style="font-size:12px; color:#666;">Av: ${s.avance || 0}%</div>
-            <div class="doc-list">${(s.docs||[]).map((d, i)=>`<div data-doc="${i}">${escapeHtml(d)} <button class="btn edit-doc tiny" data-doc="${i}">Editar</button> <button class="btn del-doc tiny red" data-doc="${i}">Eliminar</button></div>`).join('')}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <button class="btn edit-sub tiny">Editar</button>
-            <button class="btn add-doc tiny">+Doc</button>
-          </div>
-        `;
-        subsContainer.appendChild(si);
-      });
-    } else {
-      subsContainer.innerHTML = `<div class="muted">Sin sub‑hitos</div>`;
-    }
-
     configWrap.appendChild(card);
 
-    // Event listeners: delegation local (per tarjeta)
-    attachCardHandlers(card, h);
-    // Drag handlers
+    // Adjuntar drag handlers
     attachDragHandlers(card);
   });
 
-  // After rendering, append an "add placeholder" card at the end so user can quickly add a hito by clicking
+  // After rendering, append an "add placeholder" card at the end
   const addCard = document.createElement('div');
   addCard.className = 'hito-card config';
   addCard.style.display = 'flex';
   addCard.style.alignItems = 'center';
   addCard.style.justifyContent = 'center';
+  addCard.style.cursor = 'default';
   addCard.innerHTML = `<button id="btnQuickAddHito" class="btn blue">+ Agregar nuevo hito</button>`;
   configWrap.appendChild(addCard);
   document.getElementById('btnQuickAddHito')?.addEventListener('click', ()=> {
@@ -278,68 +303,74 @@ function renderHitosConfig(){
   });
 }
 
-/* Adjunta handlers a cada tarjeta (edición inline, añadir sub, etc.) */
-function attachCardHandlers(card, h){
-  // Edit hito
-  const btnEdit = card.querySelector('.edit-hito');
-  btnEdit.addEventListener('click', ()=> startEditHito(card, h));
+// ===========================================
+// Delegación de Eventos en Configuración
+// ===========================================
 
-  // Delete hito
-  const btnDel = card.querySelector('.delete-hito');
-  btnDel.addEventListener('click', ()=> {
-    if(!confirm(`¿Eliminar hito "${h.title}"?`)) return;
-    data = data.filter(x=>x.id!==h.id);
-    saveData(data);
-    renderHitosConfig();
-    renderHitos();
-    showNotice('Hito eliminado');
-  });
+// Listener para el contenedor principal de la configuración
+configWrap.addEventListener('click', (event) => {
+    const target = event.target;
+    const card = target.closest('.hito-card.config');
+    if (!card) return;
 
-  // Add sub-hito button
-  const btnAddSub = card.querySelector('.add-sub');
-  btnAddSub.addEventListener('click', ()=> {
-    // abrir formulario inline para nuevo sub-hito
-    openNewSubForm(card, h);
-  });
+    const hitoId = card.dataset.id;
+    const h = data.find(x => x.id === hitoId);
+    if (!h) return;
 
-  // Sub item delegation (edit sub, add doc, edit doc, del doc)
-  card.querySelectorAll('.sub-item').forEach(si=>{
-    const sid = si.dataset.sid;
-    const s = h.subhitos.find(x=>x.id===sid);
-
-    si.querySelector('.edit-sub')?.addEventListener('click', ()=> startEditSub(si, h, s, card));
-    si.querySelector('.add-doc')?.addEventListener('click', ()=> openNewDocForm(si, h, s, card));
-
-    si.querySelectorAll('.edit-doc').forEach(b=>{
-      b.addEventListener('click', (ev)=>{
-        const di = ev.target.dataset.doc;
-        startEditDoc(si, h, s, parseInt(di,10), card);
-      });
-    });
-
-    si.querySelectorAll('.del-doc').forEach(b=>{
-      b.addEventListener('click', (ev)=>{
-        const di = parseInt(ev.target.dataset.doc,10);
-        if(!confirm('¿Eliminar documento?')) return;
-        s.docs.splice(di,1);
+    // ============= Hito Actions =============
+    if (target.classList.contains('edit-hito')) {
+        startEditHito(card, h);
+    } else if (target.classList.contains('add-sub')) {
+        openNewSubForm(card, h);
+    } else if (target.classList.contains('delete-hito')) {
+        if(!confirm(`¿Eliminar hito "${h.title}"?`)) return;
+        data = data.filter(x=>x.id!==h.id);
         saveData(data);
         renderHitosConfig();
         renderHitos();
-        showNotice('Documento eliminado');
-      });
-    });
-  });
-}
+        showNotice('Hito eliminado');
+    }
+
+    // ============= Sub-hito & Document Actions =============
+    const subId = target.dataset.subid;
+    const subItemEl = target.closest('.sub-item');
+    const s = h.subhitos ? h.subhitos.find(x => x.id === subId) : null;
+
+    if (s) {
+        if (target.classList.contains('edit-sub')) {
+            startEditSub(subItemEl, h, s, card);
+        } else if (target.classList.contains('delete-sub')) {
+            if(!confirm(`¿Eliminar sub-hito "${s.title}"?`)) return;
+            h.subhitos = h.subhitos.filter(x=>x.id!==s.id);
+            recalcHitoAvance(h);
+            saveData(data);
+            renderHitosConfig();
+            renderHitos();
+            showNotice('Sub-hito eliminado');
+        } else if (target.classList.contains('add-doc')) {
+            openNewDocForm(subItemEl, h, s, card);
+        } else if (target.classList.contains('edit-doc')) {
+            const di = parseInt(target.dataset.doc, 10);
+            startEditDoc(target.closest('.sub-item'), h, s, di, card);
+        } else if (target.classList.contains('del-doc')) {
+            const di = parseInt(target.dataset.doc, 10);
+            if(!confirm('¿Eliminar documento?')) return;
+            s.docs.splice(di,1);
+            saveData(data);
+            renderHitosConfig();
+            renderHitos();
+            showNotice('Documento eliminado');
+        }
+    }
+});
+
 
 /* Inicia edición inline de un hito */
 function startEditHito(card, h){
   if(card.querySelector('.editing')) return; // evitar doble edición
   card.classList.add('editing');
   const content = card.querySelector('.hito-content');
-  const titleEl = content.querySelector('.hito-title-el');
-  const descEl = content.querySelector('.hito-desc-el');
-  const metaEl = content.querySelector('.card-meta');
-
+  
   const tpl = document.createElement('div');
   tpl.innerHTML = `
     <label>Título</label>
@@ -372,11 +403,13 @@ function startEditHito(card, h){
   tpl.querySelector('.save-hito').addEventListener('click', ()=>{
     const newTitle = tpl.querySelector('.edit-title').value.trim();
     if(!newTitle) return alert('Título requerido');
+    
     h.title = newTitle;
     h.desc = tpl.querySelector('.edit-desc').value.trim();
     h.priority = tpl.querySelector('.edit-priority').value;
-    const av = parseInt(tpl.querySelector('.edit-avance').value||'0',10);
-    h.avance = isNaN(av)?0:av;
+    
+    const av = clampAvance(tpl.querySelector('.edit-avance').value);
+    h.avance = av;
 
     saveData(data);
     tpl.remove();
@@ -396,25 +429,32 @@ function openNewSubForm(card, h){
   }
   const container = card.querySelector('.subs-container') || card.querySelector('.sub-list');
   const form = document.createElement('div');
-  form.className = 'form-new-sub';
+  form.className = 'form-new-sub sub-item';
   form.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;width:100%;">
       <input class="small-input new-sub-title" placeholder="Título sub-hito" />
-      <input class="small-input new-sub-avance" type="number" min="0" max="100" value="0" />
+      <div style="display:flex;gap:6px;align-items:center;">
+        <label>Avance inicial (%):</label>
+        <input class="small-input new-sub-avance" type="number" min="0" max="100" value="0" style="width:60px;"/>
+      </div>
       <div style="display:flex;gap:6px;">
-        <button class="btn create-sub blue">Crear</button>
-        <button class="btn cancel-sub">Cancelar</button>
+        <button class="btn create-sub blue small">Crear</button>
+        <button class="btn cancel-sub small">Cancelar</button>
       </div>
     </div>
   `;
   container.prepend(form);
+  form.querySelector('.new-sub-title').focus();
+
   form.querySelector('.cancel-sub').addEventListener('click', ()=> form.remove());
   form.querySelector('.create-sub').addEventListener('click', ()=>{
     const title = form.querySelector('.new-sub-title').value.trim();
-    const av = parseInt(form.querySelector('.new-sub-avance').value||'0',10);
+    const av = clampAvance(form.querySelector('.new-sub-avance').value);
+
     if(!title) return alert('Título requerido');
     if(!h.subhitos) h.subhitos = [];
-    const newSub = { id: uid('s'), title, avance: isNaN(av)?0:av, docs: [] };
+    
+    const newSub = { id: uid('s'), title, avance: av, docs: [] };
     h.subhitos.push(newSub);
     recalcHitoAvance(h);
     saveData(data);
@@ -433,26 +473,31 @@ function startEditSub(subItemEl, h, s, card){
 
   subItemEl.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:6px;width:100%;">
+      <label>Título sub-hito</label>
       <input class="small-input edit-sub-title" value="${escapeHtml(s.title)}" />
+      <label>Avance (%)</label>
       <input class="small-input edit-sub-avance" type="number" min="0" max="100" value="${s.avance||0}" />
-      <div style="display:flex;gap:6px;">
-        <button class="btn save-sub green">Guardar</button>
-        <button class="btn cancel-sub">Cancelar</button>
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <button class="btn save-sub green small">Guardar</button>
+        <button class="btn cancel-sub small">Cancelar</button>
       </div>
     </div>
   `;
+  subItemEl.querySelector('.edit-sub-title').focus();
+  
   subItemEl.querySelector('.cancel-sub').addEventListener('click', ()=>{
     subItemEl.classList.remove('editing-sub');
-    subItemEl.innerHTML = backupHtml;
-    // reattach handlers (since we replaced innerHTML)
-    renderHitosConfig(); // simple way to restore listeners
+    // Restaurar HTML (y perder listeners, por lo que re-renderizar es más simple)
+    renderHitosConfig(); 
   });
   subItemEl.querySelector('.save-sub').addEventListener('click', ()=>{
     const newTitle = subItemEl.querySelector('.edit-sub-title').value.trim();
-    const av = parseInt(subItemEl.querySelector('.edit-sub-avance').value||'0',10);
+    const av = clampAvance(subItemEl.querySelector('.edit-sub-avance').value);
+    
     if(!newTitle) return alert('Título requerido');
     s.title = newTitle;
-    s.avance = isNaN(av)?0:av;
+    s.avance = av;
+    
     recalcHitoAvance(h);
     saveData(data);
     renderHitosConfig();
@@ -470,7 +515,7 @@ function openNewDocForm(subItemEl, h, s, card){
   const form = document.createElement('div');
   form.className = 'form-new-doc';
   form.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:6px;">
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;padding-left:10px; border-left: 2px solid #ddd;">
       <input class="small-input new-doc-name" placeholder="Nombre documento" />
       <select class="small-input new-doc-status">
         <option value="pending">Pendiente</option>
@@ -478,12 +523,14 @@ function openNewDocForm(subItemEl, h, s, card){
         <option value="rejected">Rechazado</option>
       </select>
       <div style="display:flex;gap:6px;">
-        <button class="btn create-doc blue">Agregar</button>
-        <button class="btn cancel-doc">Cancelar</button>
+        <button class="btn create-doc blue tiny">Agregar</button>
+        <button class="btn cancel-doc tiny">Cancelar</button>
       </div>
     </div>
   `;
-  subItemEl.appendChild(form);
+  subItemEl.querySelector('.doc-list')?.appendChild(form);
+  form.querySelector('.new-doc-name').focus();
+
   form.querySelector('.cancel-doc').addEventListener('click', ()=> form.remove());
   form.querySelector('.create-doc').addEventListener('click', ()=>{
     const name = form.querySelector('.new-doc-name').value.trim();
@@ -503,6 +550,7 @@ function startEditDoc(subItemEl, h, s, di, card){
   // buscar el nodo del doc actual
   const docNode = subItemEl.querySelector(`[data-doc="${di}"]`);
   if(!docNode) return;
+  
   // parse existing text
   const text = s.docs[di] || '';
   const match = text.match(/^(.*)\s\[(.*)\]$/);
@@ -512,20 +560,24 @@ function startEditDoc(subItemEl, h, s, di, card){
   // reemplazar por formulario inline
   const backup = docNode.innerHTML;
   docNode.innerHTML = `
-    <input class="small-input edit-doc-name" value="${escapeHtml(name)}" />
-    <select class="small-input edit-doc-status">
-      <option ${status==='pending'?'selected':''} value="pending">Pendiente</option>
-      <option ${status==='approved'?'selected':''} value="approved">Aprobado</option>
-      <option ${status==='rejected'?'selected':''} value="rejected">Rechazado</option>
-    </select>
-    <div style="display:flex;gap:6px;margin-top:6px;">
-      <button class="btn save-doc green">Guardar</button>
-      <button class="btn cancel-doc">Cancelar</button>
+    <div class="editing-doc">
+        <input class="small-input edit-doc-name" value="${escapeHtml(name)}" />
+        <select class="small-input edit-doc-status">
+          <option ${status==='pending'?'selected':''} value="pending">Pendiente</option>
+          <option ${status==='approved'?'selected':''} value="approved">Aprobado</option>
+          <option ${status==='rejected'?'selected':''} value="rejected">Rechazado</option>
+        </select>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <button class="btn save-doc green tiny">Guardar</button>
+          <button class="btn cancel-doc tiny">Cancelar</button>
+        </div>
     </div>
   `;
+  docNode.querySelector('.edit-doc-name').focus();
+
   docNode.querySelector('.cancel-doc').addEventListener('click', ()=>{
     docNode.innerHTML = backup;
-    renderHitosConfig();
+    renderHitosConfig(); // Re-render para restaurar listeners en la tarjeta
   });
   docNode.querySelector('.save-doc').addEventListener('click', ()=>{
     const newName = docNode.querySelector('.edit-doc-name').value.trim();
@@ -539,8 +591,9 @@ function startEditDoc(subItemEl, h, s, di, card){
   });
 }
 
+
 /* ============================================
-   Drag & Drop: reordenar hitos
+    Drag & Drop: reordenar hitos
 ============================================ */
 let dragSrcId = null;
 function attachDragHandlers(card){
@@ -561,12 +614,15 @@ function attachDragHandlers(card){
     e.preventDefault();
     const targetId = card.dataset.id;
     if(!dragSrcId || dragSrcId === targetId) return;
+    
     // reorder data: move element with id dragSrcId to position of targetId
     const srcIndex = data.findIndex(x=>x.id===dragSrcId);
     const targetIndex = data.findIndex(x=>x.id===targetId);
     if(srcIndex < 0 || targetIndex < 0) return;
+    
     const [moved] = data.splice(srcIndex,1);
     data.splice(targetIndex,0,moved);
+    
     saveData(data);
     renderHitosConfig();
     renderHitos();
@@ -575,12 +631,13 @@ function attachDragHandlers(card){
 }
 
 /* ============================================
-   Acciones globales de la vista configuracion
+    Acciones globales de la vista configuracion
 ============================================ */
 document.getElementById('btnAddHitoVisual')?.addEventListener('click', ()=>{
   const title = document.getElementById('addHitoTitleInput').value.trim();
   const priority = document.getElementById('addHitoPriority').value;
   if(!title) return alert('Ingresa título para el nuevo hito');
+  
   const newH = { id: uid('h'), title, desc:'', priority, avance:0, subhitos:[] };
   data.push(newH);
   saveData(data);
@@ -598,8 +655,8 @@ document.getElementById('btnSaveAll')?.addEventListener('click', ()=>{
 
 /* Reset seed (el mismo botón ya existe; aquí lo reutilizamos) */
 document.getElementById('btnResetSeed')?.addEventListener('click',()=>{
-  if(!confirm('¿Restaurar datos iniciales?')) return;
-  data = JSON.parse(JSON.stringify(seed));
+  if(!confirm('¿Restaurar datos iniciales? Esto eliminará todos los cambios.')) return;
+  data = JSON.parse(JSON.stringify(seed)); // Deep copy del seed
   saveData(data);
   renderHitosConfig();
   renderHitos();
@@ -607,7 +664,7 @@ document.getElementById('btnResetSeed')?.addEventListener('click',()=>{
 });
 
 /* ============================================
-   Util: escapar HTML (pequeña protección al inyectar valores)
+    Util: escapar HTML (pequeña protección al inyectar valores)
 ============================================ */
 function escapeHtml(str){
   if(!str) return '';
@@ -619,13 +676,13 @@ function escapeHtml(str){
 }
 
 /* ============================================
-   Inicialización
+    Inicialización
 ============================================ */
 window.addEventListener('load',()=>{
   renderHitos();
   createConnectors();
-  // Prepare config view only when switched
 });
 
 window.addEventListener('resize',()=> createConnectors());
+// Re-calcular conectores si hay scroll horizontal en el contenedor de hitos
 wrap.addEventListener('scroll',()=> window.requestAnimationFrame(createConnectors()));
