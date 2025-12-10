@@ -20,6 +20,8 @@
       .drag-handle { position:absolute; top:6px; right:6px; cursor:grab; font-size:12px; opacity:.6; }
       .editing { outline:2px dashed #38f3; }
       .small-input { width: 100%; box-sizing:border-box; }
+      /* pequeño estilo para el enlace volver si .btn no existe */
+      .btn-back { padding:6px 10px; border-radius:4px; border:1px solid #ccc; background:#f7f7f7; text-decoration:none; color:#222; font-size:14px; }
     </style>
 </head>
 <body>
@@ -27,20 +29,19 @@
     <!-- ============================
          BARRA SUPERIOR
     ============================= -->
-    <header class="topbar">
-        <h1>Dashboard Planteles — Línea de Avance</h1>
+    <header class="topbar" style="display:flex;align-items:center;gap:12px;">
+        <h1 style="margin:0">Dashboard Planteles — Línea de Avance</h1>
 
-        <div class="tabs">
+        <div class="tabs" style="margin-left:12px;">
             <button class="tab active" data-view="visual" onclick="switchView('visual')">Visualización</button>
             <button class="tab" data-view="config" onclick="switchView('config')">Configuración</button>
         </div>
 
-         <!-- Botón Volver al índice principal -->
+        <!-- Botón Menu (misma clase .btn que el resto, texto "Menu") -->
         <div style="margin-left:auto;">
           <!-- Ajusta href="../index.html" si tu index principal está en otra ruta -->
-          <a id="btnBackHome" class="btn-back" href="../index.html" title="Volver al índice de dashboards">← Volver</a>
+          <a id="btnMenu" class="btn" href="../index.html" title="Ir al menú principal">Menu</a>
         </div>
-        
     </header>
 
 
