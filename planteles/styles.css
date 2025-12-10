@@ -1,374 +1,414 @@
-:root {
-  --bg:#f6f8fb;
-  --card:#ffffff;
-  --accent:#2b82d9;
-  --muted:#5b6470;
-  --glass: rgba(43,130,217,0.12);
-  --line:#dceafc;
-
-  /* Colores de botones */
-  --btn-blue:#2b82d9;
-  --btn-green:#10b981;
-  --btn-red:#ef4444;
-}
-
-/* ===== GENERAL ===== */
+/* =========================================
+   RESET y Base
+========================================= */
 body {
-  font-family: "Segoe UI", Arial, sans-serif;
-  margin:0;
-  padding:18px;
-  background:var(--bg);
-  color:#212529;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 }
 
-h1 {
-  margin:0;
-  font-size:20px;
-  color:#233043;
+h1, h2 {
+    color: #2c3e50;
+    font-weight: 600;
 }
 
-h2 {
-    font-size: 16px;
-    color: #233043;
-    margin: 12px 0 6px 0;
-}
-
-p.lead {
-  margin:0;
-  color:var(--muted);
-  font-size:13px;
-}
-
-header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  margin-bottom:12px;
-}
-
-/* BOTONES BASE */
+/* =========================================
+   Botones y Elementos de Interfaz
+========================================= */
 .btn {
-    padding:8px 12px;
-    border-radius:8px;
-    border:1px solid transparent;
-    cursor:pointer;
-    font-weight:600;
-    transition:background 0.2s ease, border-color 0.2s ease;
-    text-decoration: none;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
     font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    text-decoration: none; /* Asegura que funcione como botón para el label */
+    display: inline-block;
 }
 
-.btn.blue { background: var(--btn-blue); color: white; }
-.btn.green { background: var(--btn-green); color: white; }
-.btn.red { background: var(--btn-red); color: white; }
-
-.btn.blue:hover { background: #1d6ab0; }
-.btn.green:hover { background: #0c9c6f; }
-.btn.red:hover { background: #c23333; }
-
-.btn.small { padding:6px 10px; font-size:13px; }
-.btn.tiny { padding:3px 6px; font-size:10px; font-weight: 500;}
-
-/* ===== TABS ===== */
-.tabs { display:flex; gap:8px; margin-left:12px; }
-.tab {
-  padding:8px 12px;
-  border-radius:8px;
-  background:#fff;
-  border:1px solid #eef2f7;
-  cursor:pointer;
-  font-weight:700;
-}
-.tab.active {
-  background:var(--accent);
-  color:#fff;
-  border-color: var(--accent);
+.btn:hover {
+    opacity: 0.9;
 }
 
-/* ===== ÁREA CONTENIDO ===== */
-.view-area { margin-top:8px; }
-
-/* ===== VISUALIZACIÓN: Hitos ===== */
-.hitos-wrap {
-  position:relative;
-  background:transparent;
-  padding:28px 6px 34px;
-  overflow-x:auto;
-  white-space:nowrap;
-  margin-bottom:18px;
-  border-radius:8px;
-  /* Scrollbar estético, opcional */
-  scrollbar-width: thin;
-  scrollbar-color: var(--accent) transparent;
+.btn.blue {
+    background-color: #3498db;
+    color: white;
 }
 
-.connector-line {
-  position:absolute;
-  left:6px;
-  right:6px;
-  height:6px;
-  background:linear-gradient(90deg,var(--line),rgba(0,0,0,0.02));
-  top:60%;
-  transform:translateY(-50%);
-  border-radius:6px;
-  z-index:0;
-  pointer-events:none;
+.btn.green {
+    background-color: #2ecc71;
+    color: white;
 }
 
-.hito-card {
-  display:inline-block;
-  vertical-align:top;
-  width:260px;
-  margin:0 12px;
-  background:var(--card);
-  border-radius:12px;
-  box-shadow:0 6px 20px rgba(13,23,36,0.06);
-  border:2px solid transparent;
-  padding:14px;
-  cursor:pointer;
-  transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;
-  position:relative;
-  z-index:2;
+.btn.red {
+    background-color: #e74c3c;
+    color: white;
 }
 
-.hito-card:hover {
-  transform:translateY(-6px);
-  box-shadow:0 14px 30px rgba(13,23,36,0.09);
+.btn.small {
+    padding: 6px 12px;
+    font-size: 13px;
 }
 
-.hito-card.active {
-  border-color:var(--accent);
-  box-shadow:0 18px 36px rgba(43,130,217,0.12);
+.btn.tiny {
+    padding: 3px 6px;
+    font-size: 11px;
 }
 
-.hito-title {
-  font-weight:700;
-  color:#1f2937;
-  margin-bottom:6px;
-  font-size:15px;
+/* Estilo para el label que actúa como botón de Importar */
+label.btn {
+    background: #4CAF50; /* Color distintivo de Importar */
+    color: white;
+    cursor: pointer;
 }
 
-.hito-desc {
-  color:var(--muted);
-  font-size:13px;
-  margin:0 0 8px 0;
-  min-height:32px;
-}
-
-.hito-meta {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:8px;
-  margin-top:8px;
+.muted {
+    color: #7f8c8d;
 }
 
 .badge {
-  font-size:12px;
-  padding:6px 8px;
-  border-radius:999px;
-  background:var(--glass);
-  color:var(--accent);
-  font-weight:600;
+    display: inline-block;
+    padding: 4px 8px;
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
 }
 
+/* =========================================
+   Barra Superior y Navegación
+========================================= */
+.topbar {
+    padding: 15px 20px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tabs .tab {
+    background: #ecf0f1;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+.tabs .tab.active {
+    background: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+/* =========================================
+   VISTA DE CONFIGURACIÓN
+========================================= */
+#configView {
+    padding: 20px;
+    flex-grow: 1;
+    overflow-y: auto; /* Permite el scroll en la vista de configuración */
+}
+
+.config-toolbar {
+    background: #fdfdfd;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #eee;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.config-toolbar input, .config-toolbar select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Notificaciones de Configuración */
+.notice {
+    padding: 10px 15px;
+    background-color: #e8f5e9;
+    color: #1b5e20;
+    border: 1px solid #c8e6c9;
+    border-radius: 4px;
+    margin-top: 15px;
+}
+
+/* =========================================
+   TARJETAS DE CONFIGURACIÓN
+========================================= */
+#hitosConfigWrap {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.hito-card.config {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-left: 5px solid #3498db;
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    display: flex;
+    gap: 15px;
+    cursor: grab;
+    transition: background-color 0.2s;
+}
+
+.hito-card.config:hover {
+    background-color: #f9f9f9;
+}
+
+.hito-card.config .drag-handle {
+    font-size: 18px;
+    color: #7f8c8d;
+    cursor: grab;
+    align-self: flex-start;
+    padding: 5px;
+}
+
+.hito-card.config.editing {
+    border-left-color: #e67e22;
+}
+
+.hito-card.config .hito-content {
+    flex-grow: 1;
+}
+
+.card-actions {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #eee;
+    display: flex;
+    gap: 8px;
+}
+
+.sub-list {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.subs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 5px;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+}
+
+.sub-item {
+    padding: 8px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sub-item .doc-list {
+    margin-top: 5px;
+    padding-left: 0;
+    list-style: none;
+    font-size: 12px;
+}
+
+.sub-item .doc-list div {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 2px;
+}
+
+/* Estilos para formularios inline de edición */
+.small-input {
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+textarea.small-input {
+    resize: vertical;
+}
+
+/* =========================================
+   VISTA DE VISUALIZACIÓN
+========================================= */
+#visualView {
+    flex-grow: 1;
+    overflow-x: auto; /* Permite el scroll horizontal */
+    overflow-y: hidden;
+    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.hitos-wrap {
+    display: flex;
+    padding: 50px 20px;
+    gap: 30px;
+    position: relative;
+    align-items: center;
+    min-height: 250px; /* Altura mínima para mostrar la línea */
+}
+
+/* Línea de Conexión */
+.connector-line {
+    position: absolute;
+    height: 4px;
+    background-color: #bdc3c7;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Puntos de Conexión */
 .connector-dot {
-  position:absolute;
-  width:14px;
-  height:14px;
-  border-radius:999px;
-  background:var(--card);
-  border:3px solid var(--accent);
-  box-shadow:0 6px 14px rgba(43,130,217,0.12);
-  transform:translate(-50%,-50%);
-  z-index:1;
-  pointer-events:none;
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background-color: #34495e;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    pointer-events: none;
 }
 
-/* ===== DETALLE ===== */
+/* Tarjeta de Hito (Visualización) */
+.hito-card {
+    min-width: 250px;
+    max-width: 300px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    position: relative;
+    z-index: 3;
+    border: 1px solid #eee;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Empuja el meta al fondo */
+}
+
+.hito-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hito-card.active {
+    border: 2px solid #3498db;
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+}
+
+.hito-card .hito-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: #2c3e50;
+    margin-bottom: 5px;
+    /* Para evitar que el título también se desborde */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; 
+}
+
+/* AJUSTE CLAVE: Limitar la descripción a 3 líneas */
+.hito-card .hito-desc {
+    white-space: normal;
+    word-break: break-word; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* <--- Máximo 3 líneas de descripción */
+    -webkit-box-orient: vertical;
+    
+    margin-top: 4px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    line-height: 1.4;
+    min-height: calc(1.4 * 3em); /* Asegura altura mínima para evitar saltos de línea al renderizar */
+    color: #555;
+}
+
+.hito-card .hito-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 8px;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* =========================================
+   ÁREA DE DETALLE
+========================================= */
 .detalle-area {
-    margin-top:18px;
+    margin: 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #3498db;
+}
+
+.detalle-area h2 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 18px;
 }
 
 .detalle-inner {
-  background:#fff;
-  border-radius:10px;
-  padding:12px;
-  box-shadow:0 6px 20px rgba(0,0,0,0.04);
-  display:flex;
-  gap:12px;
-  align-items:flex-start;
-  flex-wrap:wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 10px;
 }
 
 .subhito {
-  flex:1 1 260px;
-  background:#fafcff;
-  border-radius:8px;
-  padding:10px;
-  border:1px solid #eef6ff;
-}
-
-.subhito strong {
-  display:block;
-  margin-bottom:6px;
-  font-size:14px;
+    padding: 10px;
+    border: 1px solid #ecf0f1;
+    border-radius: 4px;
+    background-color: #f9f9f9;
 }
 
 .sub-prog {
-  font-size:13px;
-  color:var(--accent);
-  font-weight:700;
-  margin-bottom:6px;
+    font-size: 13px;
+    color: #27ae60;
+    font-weight: 600;
+    margin-top: 4px;
 }
 
 .docs {
-  font-size:13px;
-  color:var(--muted);
-  padding-left:14px;
-  margin:0;
+    list-style: none;
+    padding-left: 0;
+    margin-top: 8px;
+    font-size: 12px;
 }
 
 .docs li {
-  margin:6px 0;
-}
-
-/* ===== FORMULARIOS GENERALES (compartidos por config) ===== */
-input[type="text"], input[type="number"], select, textarea {
-  padding:8px;
-  border-radius:8px;
-  border:1px solid #e6eaf0;
-  width:100%;
-  box-sizing: border-box;
-}
-
-label {
-  font-size:13px;
-  color:var(--muted);
-  margin:6px 0 3px 0; /* Ajuste para formularios inline */
-  display:block;
-}
-
-.muted { color:var(--muted); }
-.notice {
-    padding: 10px 14px;
-    background: #e6f7ff;
-    border: 1px solid #91d5ff;
-    color: #004780;
-    border-radius: 6px;
-}
-
-
-/* ========================================================
-   ESTILOS DE CONFIGURACIÓN (Movidos desde index.html)
-   ======================================================== */
-.config-toolbar { 
-    display:flex; 
-    gap:8px; 
-    align-items:center; 
-    margin-bottom:10px; 
-    flex-wrap: wrap; 
-}
-#hitosConfigWrap { 
-    display:flex; 
-    gap:12px; 
-    align-items:flex-start; 
-    padding:8px; 
-    overflow-x:auto; 
-    border:1px dashed #ddd; 
-    min-height:120px;
-    white-space: nowrap; /* Mantiene las tarjetas en línea */
-}
-.hito-card.config { 
-    width:260px; 
-    cursor:grab; 
-    position:relative; 
-    padding:10px; 
-    border:1px solid #ccc; 
-    background:#fff; 
-    border-radius:6px; 
-    /* Sobrescribe estilos de la vista visual */
-    display: inline-block;
-    vertical-align: top;
-    box-shadow: none;
-    transform: none;
-    transition: none;
-    margin: 0;
-    flex-shrink: 0;
-}
-.hito-card.config:hover {
-    transform: none;
-    box-shadow: none;
-}
-.card-meta { 
-    margin-top:8px; 
-    font-size:13px; 
-    color:#666; 
-}
-.card-actions { 
-    display:flex; 
-    gap:6px; 
-    margin-top:10px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #eee;
-}
-.sub-list { 
-    margin-top:8px; 
-    padding-left:0;
-    font-size: 14px;
-}
-.sub-item { 
-    display:flex; 
-    justify-content:space-between; 
-    align-items:flex-start; 
-    font-size:13px; 
-    padding:4px 0; 
-    border-bottom: 1px dotted #eee;
-}
-.doc-list { 
-    margin-top:6px; 
-    padding-left:0; 
-    font-size:13px; 
-    color:#444; 
-}
-.doc-list > div {
-    margin: 4px 0;
-    padding-left: 10px;
-    border-left: 2px solid #ddd;
-}
-.drag-handle { 
-    position:absolute; 
-    top:6px; 
-    right:6px; 
-    cursor:grab; 
-    font-size:12px; 
-    opacity:.6; 
-}
-.editing { 
-    outline:2px dashed var(--accent);
-}
-.small-input { 
-    width: 100%; 
-    box-sizing:border-box;
-    font-size: 13px;
-    padding: 6px 8px;
-}
-
-
-/* ===== RESPONSIVE ===== */
-@media (max-width:720px) {
-  .hito-card {
-    width:85%;
-    display:block;
-    margin:10px auto;
-  }
-  .detalle-inner { flex-direction:column; }
-  .subhito { width:100%; flex-basis:100%; }
-  .connector-line { display:none; }
-  .connector-dot { display:none; }
-  .tabs { display:none; }
-  .config-toolbar { flex-direction: column; align-items: stretch;}
-  .config-toolbar > div { margin-left: 0 !important; width: 100%; }
-  .config-toolbar input, .config-toolbar select, .config-toolbar button { width: auto; flex-grow: 1;}
+    padding: 2px 0;
+    border-left: 3px solid #ccc;
+    padding-left: 5px;
+    margin-bottom: 2px;
 }
