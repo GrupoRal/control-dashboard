@@ -1,4 +1,3 @@
-
 :root {
   --bg:#f6f8fb;
   --card:#ffffff;
@@ -6,6 +5,11 @@
   --muted:#5b6470;
   --glass: rgba(43,130,217,0.12);
   --line:#dceafc;
+
+  /* Colores de botones */
+  --btn-blue:#2b82d9;
+  --btn-green:#10b981;
+  --btn-red:#ef4444;
 }
 
 /* ===== GENERAL ===== */
@@ -23,6 +27,12 @@ h1 {
   color:#233043;
 }
 
+h2 {
+    font-size: 16px;
+    color: #233043;
+    margin: 12px 0 6px 0;
+}
+
 p.lead {
   margin:0;
   color:var(--muted);
@@ -37,20 +47,28 @@ header {
   margin-bottom:12px;
 }
 
-/* ===== BOTÓN VOLVER ===== */
-.back-btn {
-  display:inline-block;
-  background:var(--accent);
-  color:white;
-  padding:8px 12px;
-  border-radius:8px;
-  text-decoration:none;
-  font-weight:600;
-  transition:background 0.2s ease;
+/* BOTONES BASE */
+.btn {
+    padding:8px 12px;
+    border-radius:8px;
+    border:1px solid transparent;
+    cursor:pointer;
+    font-weight:600;
+    transition:background 0.2s ease, border-color 0.2s ease;
+    text-decoration: none;
+    font-size: 14px;
 }
-.back-btn:hover {
-  background:#1d6ab0;
-}
+
+.btn.blue { background: var(--btn-blue); color: white; }
+.btn.green { background: var(--btn-green); color: white; }
+.btn.red { background: var(--btn-red); color: white; }
+
+.btn.blue:hover { background: #1d6ab0; }
+.btn.green:hover { background: #0c9c6f; }
+.btn.red:hover { background: #c23333; }
+
+.btn.small { padding:6px 10px; font-size:13px; }
+.btn.tiny { padding:3px 6px; font-size:10px; font-weight: 500;}
 
 /* ===== TABS ===== */
 .tabs { display:flex; gap:8px; margin-left:12px; }
@@ -65,6 +83,7 @@ header {
 .tab.active {
   background:var(--accent);
   color:#fff;
+  border-color: var(--accent);
 }
 
 /* ===== ÁREA CONTENIDO ===== */
@@ -79,6 +98,9 @@ header {
   white-space:nowrap;
   margin-bottom:18px;
   border-radius:8px;
+  /* Scrollbar estético, opcional */
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
 }
 
 .connector-line {
@@ -165,11 +187,8 @@ header {
 }
 
 /* ===== DETALLE ===== */
-.detalle-row {
-  width:100%;
-  margin-top:8px;
-  padding:0 6px;
-  box-sizing:border-box;
+.detalle-area {
+    margin-top:18px;
 }
 
 .detalle-inner {
@@ -215,43 +234,127 @@ header {
   margin:6px 0;
 }
 
-/* ===== CONFIG PANEL ===== */
-.admin-panel {
-  background:#fff;
-  padding:12px;
-  border-radius:10px;
-  box-shadow:0 6px 18px rgba(0,0,0,0.06);
-  max-width:980px;
-  margin-bottom:16px;
-}
-
-.form-row {
-  display:flex;
-  gap:10px;
-  margin-bottom:8px;
-  align-items:center;
-}
-
-input[type="text"], select, textarea {
+/* ===== FORMULARIOS GENERALES (compartidos por config) ===== */
+input[type="text"], input[type="number"], select, textarea {
   padding:8px;
   border-radius:8px;
   border:1px solid #e6eaf0;
   width:100%;
+  box-sizing: border-box;
 }
 
 label {
   font-size:13px;
   color:var(--muted);
-  margin-bottom:6px;
+  margin:6px 0 3px 0; /* Ajuste para formularios inline */
   display:block;
 }
 
-.mini {
-  padding:6px 8px;
-  font-size:13px;
+.muted { color:var(--muted); }
+.notice {
+    padding: 10px 14px;
+    background: #e6f7ff;
+    border: 1px solid #91d5ff;
+    color: #004780;
+    border-radius: 6px;
 }
 
-.muted { color:var(--muted); }
+
+/* ========================================================
+   ESTILOS DE CONFIGURACIÓN (Movidos desde index.html)
+   ======================================================== */
+.config-toolbar { 
+    display:flex; 
+    gap:8px; 
+    align-items:center; 
+    margin-bottom:10px; 
+    flex-wrap: wrap; 
+}
+#hitosConfigWrap { 
+    display:flex; 
+    gap:12px; 
+    align-items:flex-start; 
+    padding:8px; 
+    overflow-x:auto; 
+    border:1px dashed #ddd; 
+    min-height:120px;
+    white-space: nowrap; /* Mantiene las tarjetas en línea */
+}
+.hito-card.config { 
+    width:260px; 
+    cursor:grab; 
+    position:relative; 
+    padding:10px; 
+    border:1px solid #ccc; 
+    background:#fff; 
+    border-radius:6px; 
+    /* Sobrescribe estilos de la vista visual */
+    display: inline-block;
+    vertical-align: top;
+    box-shadow: none;
+    transform: none;
+    transition: none;
+    margin: 0;
+    flex-shrink: 0;
+}
+.hito-card.config:hover {
+    transform: none;
+    box-shadow: none;
+}
+.card-meta { 
+    margin-top:8px; 
+    font-size:13px; 
+    color:#666; 
+}
+.card-actions { 
+    display:flex; 
+    gap:6px; 
+    margin-top:10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+.sub-list { 
+    margin-top:8px; 
+    padding-left:0;
+    font-size: 14px;
+}
+.sub-item { 
+    display:flex; 
+    justify-content:space-between; 
+    align-items:flex-start; 
+    font-size:13px; 
+    padding:4px 0; 
+    border-bottom: 1px dotted #eee;
+}
+.doc-list { 
+    margin-top:6px; 
+    padding-left:0; 
+    font-size:13px; 
+    color:#444; 
+}
+.doc-list > div {
+    margin: 4px 0;
+    padding-left: 10px;
+    border-left: 2px solid #ddd;
+}
+.drag-handle { 
+    position:absolute; 
+    top:6px; 
+    right:6px; 
+    cursor:grab; 
+    font-size:12px; 
+    opacity:.6; 
+}
+.editing { 
+    outline:2px dashed var(--accent);
+}
+.small-input { 
+    width: 100%; 
+    box-sizing:border-box;
+    font-size: 13px;
+    padding: 6px 8px;
+}
+
 
 /* ===== RESPONSIVE ===== */
 @media (max-width:720px) {
@@ -265,5 +368,7 @@ label {
   .connector-line { display:none; }
   .connector-dot { display:none; }
   .tabs { display:none; }
+  .config-toolbar { flex-direction: column; align-items: stretch;}
+  .config-toolbar > div { margin-left: 0 !important; width: 100%; }
+  .config-toolbar input, .config-toolbar select, .config-toolbar button { width: auto; flex-grow: 1;}
 }
-
