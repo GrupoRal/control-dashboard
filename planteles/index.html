@@ -64,6 +64,13 @@
         <div class="muted" style="font-size:13px;">Puedes arrastrar y soltar los hitos para reordenarlos.</div>
       </div>
 
+      <div style="margin-top:16px; border-top: 1px solid #eee; padding-top: 12px; display:flex; gap:12px; align-items:center; flex-wrap: wrap;">
+          <button id="btnExportData" class="btn blue">📥 Exportar Configuración (JSON)</button>
+          <label for="fileInput" class="btn">📤 Importar Configuración</label>
+          <input type="file" id="fileInput" accept=".json" style="display: none;">
+          <div class="muted" style="font-size:13px;">Usa esta función para compartir la línea de avance entre equipos.</div>
+      </div>
+
       <div id="configNotice" aria-live="polite" class="notice" style="display:none; margin-top:8px;"></div>
     </section>
 
